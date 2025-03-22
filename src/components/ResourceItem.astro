@@ -1,0 +1,64 @@
+---
+// ResourceItem.astro
+// This is a reusable component for individual resource cards
+
+interface Props {
+  title: string;
+  imageUrl: string;
+  link: string;
+  description?: string;
+  tags?: string[];
+  type?: string;
+  isSponsored?: boolean;
+}
+
+const { 
+  title, 
+  imageUrl, 
+  link, 
+  description, 
+  tags = [], 
+  type, 
+  isSponsored = false 
+} = Astro.props;
+---
+
+<div class="resource-card">
+  <div class="card-content">
+    <a href={link} class="card-image-link">
+      <div class="card-image">
+        <img src={imageUrl} alt={title} />
+        <div class="expand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 8L21 3M21 3H16M21 3V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+    <div class="card-body">
+      <h3 class="card-title">
+        <a href={link}>{title}</a>
+      </h3>
+      
+      {description && (
+        <p class="card-description">{description}</p>
+      )}
+      
+      {tags.length > 0 && !isSponsored && (
+        <div class="card-tags">
+          {tags.map(tag => (
+            <a href={`/tag/${tag.toLowerCase()}`} class="tag">{tag}</a>
+          ))}
+        </div>
+      )}
+      
+      {type && !isSponsored && (
+        <div class="card-type">{type}</div>
+      )}
+      
+      {isSponsored && (
+        <div class="card-sponsored">Sponsored</div>
+      )}
+    </div>
+  </div>
+</div>

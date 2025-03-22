@@ -1,0 +1,28 @@
+---
+// MainLayout.astro
+import Header from '../components/Header.astro';
+import '../styles/global.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4thelazy.com - Things for lazy people</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <footer class="bg-primary">
+      <div class="container">
+        <div class="text-center">
+          <p>&copy; 2025 4thelazy.com. All rights reserved.</p>
+          <p class="mt-2">Made with minimal effort but maximum results.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

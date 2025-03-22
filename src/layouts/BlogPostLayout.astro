@@ -1,0 +1,169 @@
+---
+// src/layouts/BlogPostLayout.astro
+import MainLayout from './MainLayout.astro';
+import { formatDate } from '../utils/formatDate'; // You'll need to create this utility
+
+const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.props;
+---
+
+<MainLayout>
+  <article class="blog-post">
+    <div class="container">
+      {isSponsored && <div class="sponsored-badge">Sponsored</div>}
+      
+      <div class="post-header">
+        <div class="post-meta">
+          <div class="post-type">{type}</div>
+          <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+          {updatedDate && (
+            <div class="updated-date">
+              Updated: <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+            </div>
+          )}
+        </div>
+        
+        <h1 class="post-title">{title}</h1>
+        
+        {tags && tags.length > 0 && (
+          <div class="post-tags">
+            {tags.map((tag) => (
+              <a href={`/tag/${tag.toLowerCase()}`} class="tag">{tag}</a>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {image && (
+        <div class="post-image">
+          <img src={image} alt={title} />
+        </div>
+      )}
+      
+      <div class="post-content">
+        <slot />
+      </div>
+      
+      <div class="post-footer">
+        <a href="/" class="btn btn-primary">← Back to All Resources</a>
+      </div>
+    </div>
+  </article>
+</MainLayout>
+
+<style>
+  .blog-post {
+    padding: var(--spacing-xl) 0;
+  }
+  
+  .container {
+    max-width: 800px;
+  }
+  
+  .sponsored-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-background);
+    color: var(--color-text-light);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .post-header {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+  }
+  
+  .post-type {
+    display: inline-block;
+    padding: 2px 8px;
+    background-color: var(--color-background);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+  }
+  
+  .post-title {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  
+  .tag {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    text-decoration: none;
+  }
+  
+  .tag:hover {
+    color: var(--color-primary);
+  }
+  
+  .post-image {
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  
+  .post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .post-content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+  
+  .post-content h1,
+  .post-content h2,
+  .post-content h3,
+  .post-content h4 {
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .post-content p {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .post-content ul,
+  .post-content ol {
+    margin-bottom: var(--spacing-md);
+    padding-left: var(--spacing-lg);
+  }
+  
+  .post-content li {
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .post-footer {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+  }
+  
+  @media (max-width: 768px) {
+    .post-title {
+      font-size: 2rem;
+    }
+    
+    .post-content {
+      font-size: 1rem;
+    }
+  }
+</style>

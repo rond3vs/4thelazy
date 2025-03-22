@@ -1,0 +1,50 @@
+---
+// src/pages/tag/[tag].astro
+import { getCollection } from 'astro:content';
+import MainLayout from '../../layouts/MainLayout.astro';
+import BlogResources from '../../components/BlogResources.astro';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  
+  // Get all unique tags
+  const uniqueTags = [...new Set(allPosts.map(post => post.data.tags).flat())];
+  
+  // Create a path for each tag
+  return uniqueTags.map(tag => ({
+    params: { tag: tag.toLowerCase() },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+---
+
+<MainLayout>
+  <div class="tag-header">
+    <div class="container">
+      <h1>Resources tagged with: {tag}</h1>
+      <a href="/" class="back-link">← Back to all resources</a>
+    </div>
+  </div>
+  
+  <BlogResources tag={tag} />
+</MainLayout>
+
+<style>
+  .tag-header {
+    padding: var(--spacing-xl) 0 var(--spacing-md);
+    text-align: center;
+  }
+  
+  .back-link {
+    display: inline-block;
+    margin-top: var(--spacing-sm);
+    color: var(--color-text-light);
+    text-decoration: none;
+  }
+  
+  .back-link:hover {
+    color: var(--color-primary);
+  }
+</style>

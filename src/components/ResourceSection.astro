@@ -1,0 +1,313 @@
+---
+// ResourceSection.astro
+---
+
+<section class="resources-section bg-light">
+    <div class="container">
+      <!-- Filter tabs -->
+      <div class="filter-container">
+        <div class="search-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input type="text" placeholder="Search..." />
+        </div>
+        
+        <div class="filter-tabs">
+          <button class="filter-tab active">All</button>
+          <button class="filter-tab">Top picks <span class="count">45</span></button>
+          <button class="filter-tab">Articles <span class="count">61</span></button>
+          <button class="filter-tab">Books <span class="count">37</span></button>
+          <button class="filter-tab">Communities <span class="count">15</span></button>
+          <button class="filter-tab">Podcasts <span class="count">23</span></button>
+          <button class="filter-tab">Tools <span class="count">100+</span></button>
+          <button class="filter-tab">Tweets <span class="count">49</span></button>
+          <button class="filter-tab">Videos <span class="count">17</span></button>
+        </div>
+      </div>
+  
+      <!-- Resource cards grid -->
+      <div class="resources-grid">
+        <!-- Card 1 -->
+        <div class="resource-card">
+          <div class="card-content">
+            <a href="/resource/freelance-contracts" class="card-image-link">
+              <div class="card-image">
+                <img src="/images/freelance-contracts.png" alt="Freelance contracts" />
+                <div class="expand-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 8L21 3M21 3H16M21 3V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </a>
+            <div class="card-body">
+              <h3 class="card-title">
+                <a href="/resource/freelance-contracts">Freelance contracts: Dos and don'ts</a>
+              </h3>
+              <div class="card-tags">
+                <a href="/tag/contracts" class="tag">Contracts</a>
+                <a href="/tag/tips" class="tag">Tips</a>
+                <a href="/tag/advice" class="tag">Advice</a>
+              </div>
+              <div class="card-type">Article</div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Card 2 -->
+        <div class="resource-card">
+          <div class="card-content">
+            <a href="/resource/going-freelance" class="card-image-link">
+              <div class="card-image">
+                <img src="/images/going-freelance.png" alt="Going freelance guide" />
+                <div class="expand-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 8L21 3M21 3H16M21 3V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </a>
+            <div class="card-body">
+              <h3 class="card-title">
+                <a href="/resource/going-freelance">Going freelance guide</a>
+              </h3>
+              <div class="card-tags">
+                <a href="/tag/tips" class="tag">Tips</a>
+                <a href="/tag/advice" class="tag">Advice</a>
+                <a href="/tag/career" class="tag">Career</a>
+              </div>
+              <div class="card-type">Tweet</div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Card 3 -->
+        <div class="resource-card">
+          <div class="card-content">
+            <a href="/resource/email-scripts" class="card-image-link">
+              <div class="card-image">
+                <img src="/images/email-scripts.png" alt="Email scripts for freelancers" />
+                <div class="expand-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 8L21 3M21 3H16M21 3V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </a>
+            <div class="card-body">
+              <h3 class="card-title">
+                <a href="/resource/email-scripts">23 email scripts for freelancers</a>
+              </h3>
+              <p class="card-description">Email scripts to level up client communication</p>
+              <div class="card-sponsored">Sponsored</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <style>
+    .resources-section {
+      padding: var(--spacing-xl) 0;
+    }
+    
+    .filter-container {
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .search-box {
+      position: relative;
+      max-width: 300px;
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .search-box svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-light);
+    }
+    
+    .search-box input {
+      padding-left: 40px;
+      border-radius: var(--radius-full);
+    }
+    
+    .filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs);
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .filter-tab {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-full);
+      border: none;
+      background-color: var(--color-white);
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    
+    .filter-tab.active {
+      background-color: #F9DA6D;
+      font-weight: 600;
+    }
+    
+    .filter-tab:hover:not(.active) {
+      background-color: #F5F5F5;
+    }
+    
+    .count {
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+      margin-left: var(--spacing-xs);
+    }
+    
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-md);
+    }
+    
+    .resource-card {
+      background-color: var(--color-white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .resource-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card-image {
+      position: relative;
+      height: 200px;
+      background-color: #f5f5f5;
+      overflow: hidden;
+    }
+    
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    
+    .card-image-link:hover img {
+      transform: scale(1.05);
+    }
+    
+    .expand-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: var(--radius-sm);
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .card-body {
+      padding: var(--spacing-md);
+    }
+    
+    .card-title {
+      font-size: 1.1rem;
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .card-title a {
+      color: var(--color-text);
+      text-decoration: none;
+    }
+    
+    .card-title a:hover {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs);
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .tag {
+      font-size: 0.8rem;
+      color: var(--color-text-light);
+      text-decoration: none;
+    }
+    
+    .tag:hover {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    
+    .card-type {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-text-light);
+      background-color: var(--color-background);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+    
+    .card-description {
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .card-sponsored {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-text-light);
+      background-color: var(--color-background);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+    
+    @media (max-width: 992px) {
+      .resources-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .resources-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .filter-tabs {
+        overflow-x: auto;
+        padding-bottom: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      
+      .filter-tabs::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .filter-tab {
+        white-space: nowrap;
+      }
+    }
+  </style>

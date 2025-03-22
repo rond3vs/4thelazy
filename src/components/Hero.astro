@@ -1,0 +1,152 @@
+---
+// HeroSection.astro
+---
+
+<section class="hero-section">
+    <div class="container">
+      <h1 class="hero-title">
+        <span class="primary">Welcome to 4thelazy.com</span>
+        <span class="secondary">I find tools and tips for lazy people like you 🫵 (and me) | Middle ground for the productive and procrastinators 🤝</span>
+      </h1>
+      
+      <div class="subscribe-container">
+        <form class="subscribe-form" action="#" method="post">
+          <input 
+            type="email" 
+            name="email" 
+            id="email" 
+            placeholder="Your email" 
+            required
+            class="email-input"
+          />
+          <button type="submit" class="subscribe-button">
+            Subscribe
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 8L21 12L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+      
+      <p class="subscription-info">
+        Weekly hacks, tools, and fast food tricks for people who want the win without the work
+      </p>
+    </div>
+  </section>
+  
+  <style>
+    .hero-section {
+      padding: 6rem 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background-color: #F0F0F0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.2;
+      margin-bottom: 3rem;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .primary {
+      color: #205A5D;
+    }
+    
+    .secondary {
+      color: #205A5D;
+      opacity: 0.8;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .subscribe-container {
+      margin-bottom: 1rem;
+    }
+    
+    .subscribe-form {
+      display: flex;
+      max-width: 500px;
+      margin: 0 auto;
+      gap: 0.5rem;
+    }
+    
+    .email-input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 9999px;
+      font-size: 1rem;
+      background-color: white;
+    }
+    
+    .email-input:focus {
+      outline: none;
+      border-color: #205A5D;
+    }
+    
+    .subscribe-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 9999px;
+      background-color: #205A5D;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .subscribe-button:hover {
+      background-color: #184749;
+    }
+    
+    .subscription-info {
+      font-size: 0.875rem;
+      color: #205A5D;
+      opacity: 0.8;
+      margin-top: 1rem;
+    }
+    
+    @media (max-width: 640px) {
+      .hero-section {
+        padding: 4rem 1rem;
+      }
+      
+      .subscribe-form {
+        flex-direction: column;
+      }
+      
+      .email-input, 
+      .subscribe-button {
+        width: 100%;
+      }
+    }
+  </style>
+  
+  <script is:inline>
+    // You can add client-side form validation or submission logic here
+    document.querySelector('.subscribe-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email')?.value;
+      
+      // Here you would typically send the email to your backend or newsletter service
+      console.log('Subscribing email:', email);
+      
+      // For now, just show a success message (you can replace this with real functionality)
+      alert('Thanks for subscribing!');
+    });
+  </script>
