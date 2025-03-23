@@ -3,6 +3,16 @@
 import MainLayout from './MainLayout.astro';
 import { formatDate } from '../utils/formatDate'; // You'll need to create this utility
 
+interface Props {
+  title: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  image?: string;
+  tags?: string[];
+  type: string;
+  isSponsored?: boolean;
+}
+
 const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.props;
 ---
 
@@ -26,7 +36,7 @@ const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.pr
         
         {tags && tags.length > 0 && (
           <div class="post-tags">
-            {tags.map((tag) => (
+            {tags.map((tag: string) => (
               <a href={`/tag/${tag.toLowerCase()}`} class="tag">{tag}</a>
             ))}
           </div>

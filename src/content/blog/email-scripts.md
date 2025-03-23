@@ -3,7 +3,7 @@ title: "23 email scripts for freelancers"
 description: "Email scripts to level up client communication"
 pubDate: 2025-03-15
 image: "/images/email-scripts.png"
-tags: ["Communication", "Templates", "Clients"]
+tags: ["Cooking"]
 type: "Resource"
 isSponsored: true
 ---

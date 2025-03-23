@@ -1,0 +1,449 @@
+---
+// src/components/ResourceGrid.astro
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import ItemCard from './ItemCard.astro';
+
+// Extended props to support filtering by content type and category
+interface Props {
+  tag?: string;
+  limit?: number;
+  contentType?: 'all' | 'blog' | 'product'; // Filter by content type
+  debug?: boolean; // Enable debug mode
+}
+
+// Define a resource interface to unify both blog posts and products
+interface Resource {
+  type: 'blog' | 'product';
+  data: CollectionEntry<'blog'> | CollectionEntry<'products'>;
+  slug: string;
+  contentType: string;
+  title: string;
+  image: string;
+  description: string;
+  tags: string[];
+  isSponsored: boolean;
+  date: Date;
+}
+
+const { tag, limit, contentType = 'all', debug = false } = Astro.props;
+
+// Get all blog posts and products
+const allBlogPosts = await getCollection('blog');
+const blogCount = allBlogPosts.length;
+
+const allProducts = await getCollection('products');
+const productCount = allProducts.length;
+
+// Sort blog posts by publication date (newest first)
+const sortedBlogPosts = allBlogPosts.sort((a, b) => 
+  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+// Sort products by publication date (newest first)
+const sortedProducts = allProducts.sort((a, b) => {
+  // Use pubDate if available, otherwise use current date
+  const dateA = a.data.pubDate || new Date();
+  const dateB = b.data.pubDate || new Date();
+  return dateB.valueOf() - dateA.valueOf();
+});
+
+// Combine and prepare all resources
+let allResources: Resource[] = [];
+
+// Add blog posts with a content type identifier
+if (contentType === 'all' || contentType === 'blog') {
+  allResources = [
+    ...allResources,
+    ...sortedBlogPosts.map((post) => ({
+      type: 'blog' as const,
+      data: post,
+      slug: post.slug,
+      contentType: post.data.type,
+      title: post.data.title,
+      image: post.data.image || '/images/default-blog.png',
+      description: post.data.description || '',
+      tags: post.data.tags || [],
+      isSponsored: post.data.isSponsored || false,
+      date: post.data.pubDate
+    }))
+  ];
+}
+
+// Add products with a content type identifier
+if (contentType === 'all' || contentType === 'product') {
+  allResources = [
+    ...allResources,
+    ...sortedProducts.map((product) => ({
+      type: 'product' as const,
+      data: product,
+      slug: product.slug,
+      contentType: 'Product',
+      title: product.data.title,
+      image: product.data.image || '/images/default-product.png',
+      description: product.data.description || '',
+      tags: product.data.categories || [],
+      isSponsored: product.data.isSponsored || false,
+      date: product.data.pubDate || new Date()
+    }))
+  ];
+}
+
+// Sort combined resources by date
+let filteredResources = allResources.sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+// Filter by tag if specified
+if (tag && tag !== 'all') {
+  filteredResources = filteredResources.filter(resource => 
+    resource.tags && resource.tags.includes(tag)
+  );
+}
+
+// Limit the number of resources if specified
+if (limit) {
+  filteredResources = filteredResources.slice(0, limit);
+}
+
+// Get all unique tags/categories from both blogs and products for filtering
+const allBlogTags = [...new Set(allBlogPosts.map((post) => post.data.tags || []).flat())] as string[];
+const allProductCategories = [...new Set(allProducts.map((product) => 
+  product.data.categories || []
+).flat())] as string[];
+
+// Combine all tags and categories for filtering
+const allTags = [...new Set([...allBlogTags, ...allProductCategories])].sort();
+
+// Calculate counts for debugging
+const totalResources = filteredResources.length;
+const blogResources = filteredResources.filter(r => r.type === 'blog').length;
+const productResources = filteredResources.filter(r => r.type === 'product').length;
+---
+
+<section class="resources-section bg-light">
+  <div class="container">
+    <h2 class="section-title">Look around. Stay Awhile</h2>
+    
+    {debug && (
+      <div class="debug-panel">
+        <h3>Debug Information</h3>
+        <ul>
+          <li>Blog collection: {blogCount} items</li>
+          <li>Product collection: {productCount} items</li>
+          <li>Total resources loaded: {totalResources}</li>
+          <li>Blog resources: {blogResources}</li>
+          <li>Product resources: {productResources}</li>
+          <li>Current filter: {contentType}</li>
+          <li>Tag filter: {tag || 'none'}</li>
+        </ul>
+      </div>
+    )}
+    
+    <div class="filter-container">
+      <div class="search-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <input type="text" id="resource-search" placeholder="Search..." />
+      </div>
+      
+      <!-- Content type filter -->
+      <div class="content-type-tabs">
+        <button class="content-type-tab active" data-type="all">All Content ({totalResources})</button>
+        <button class="content-type-tab" data-type="blog">Blog Posts ({blogResources})</button>
+        <button class="content-type-tab" data-type="product">Products ({productResources})</button>
+      </div>
+      
+      <!-- Categories/Tags filter -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-tag="all">All Categories</button>
+        {allTags.map((tag: string) => (
+          <button class="filter-tab" data-tag={tag}>{tag}</button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Resource cards grid -->
+    <div class="resources-grid" id="resources-container">
+      {filteredResources.length > 0 ? (
+        filteredResources.map((resource) => (
+          <ItemCard 
+            title={resource.title}
+            imageUrl={resource.image}
+            link={`/${resource.type}/${resource.slug}`}
+            description={resource.description}
+            tags={resource.tags}
+            type={resource.contentType}
+            isSponsored={resource.isSponsored}
+            contentType={resource.type}
+          />
+        ))
+      ) : (
+        <div class="no-resources">
+          <p>No resources found matching the current filters.</p>
+        </div>
+      )}
+    </div>
+    
+    {debug && productCount === 0 && (
+      <div class="debug-help">
+        <h3>Troubleshooting: No Products Found</h3>
+        <p>It looks like no product files were found in your content collection. Here's what to check:</p>
+        <ul>
+          <li>Make sure you have created product files in <code>src/content/products/</code> directory</li>
+          <li>Ensure your content schema in <code>src/content/config.ts</code> has a products collection defined</li>
+          <li>Check that your product files have the correct frontmatter structure</li>
+        </ul>
+        <p>Sample product frontmatter:</p>
+        <pre><code>---
+title: "Product Title"
+description: "Product description"
+pubDate: 2024-03-22
+image: "/images/products/example.jpg"
+categories: ["Category1", "Category2"]
+isSponsored: false
+---</code></pre>
+      </div>
+    )}
+    
+    <div id="filter-debug" class="filter-debug">
+      <h3>Current Filter State:</h3>
+      <p>Content Type: <span id="current-content-type">all</span></p>
+      <p>Tag: <span id="current-tag">all</span></p>
+      <p>Search Term: <span id="current-search"></span></p>
+      <p>Visible Items: <span id="visible-count">{totalResources}</span></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-title {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+  }
+  
+  .filter-container {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .search-box {
+    position: relative;
+    max-width: 300px;
+    margin: 0 auto var(--spacing-md);
+  }
+  
+  .search-box svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-light);
+  }
+  
+  .search-box input {
+    padding-left: 40px;
+    border-radius: var(--radius-full);
+  }
+  
+  .content-type-tabs,
+  .filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .content-type-tab,
+  .filter-tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-full);
+    border: none;
+    background-color: var(--color-white);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .content-type-tab.active,
+  .filter-tab.active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-weight: 600;
+  }
+  
+  .content-type-tab:hover:not(.active),
+  .filter-tab:hover:not(.active) {
+    background-color: var(--color-background);
+  }
+  
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+  }
+  
+  .no-resources {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--spacing-xl);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+  }
+  
+  .debug-panel {
+    background-color: #f0f8ff;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid #b0d8ff;
+  }
+  
+  .debug-panel h3 {
+    margin-top: 0;
+  }
+  
+  .debug-help {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: #fff8f0;
+    border-radius: var(--radius-md);
+    border: 1px solid #ffe0b0;
+  }
+  
+  .debug-help pre {
+    background-color: #f5f5f5;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+  }
+  
+  .filter-debug {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: #f5f5f5;
+    border-radius: var(--radius-md);
+    font-family: monospace;
+  }
+  
+  @media (max-width: 992px) {
+    .resources-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .resources-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .content-type-tabs,
+    .filter-tabs {
+      overflow-x: auto;
+      padding-bottom: var(--spacing-sm);
+      margin-bottom: var(--spacing-md);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    
+    .content-type-tabs::-webkit-scrollbar,
+    .filter-tabs::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .content-type-tab,
+    .filter-tab {
+      white-space: nowrap;
+    }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get elements
+    const contentTypeTabs = document.querySelectorAll('.content-type-tab');
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const resourceCards = document.querySelectorAll('.resource-card');
+    const searchInput = document.getElementById('resource-search');
+    
+    // Debug elements
+    const currentContentTypeEl = document.getElementById('current-content-type');
+    const currentTagEl = document.getElementById('current-tag');
+    const currentSearchEl = document.getElementById('current-search');
+    const visibleCountEl = document.getElementById('visible-count');
+    
+    let activeContentType = 'all';
+    let activeTag = 'all';
+    
+    // Filter by content type
+    contentTypeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active tab
+        contentTypeTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        activeContentType = tab.getAttribute('data-type');
+        currentContentTypeEl.textContent = activeContentType;
+        filterResources();
+      });
+    });
+    
+    // Filter by tag/category
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active tab
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        activeTag = tab.getAttribute('data-tag');
+        currentTagEl.textContent = activeTag;
+        filterResources();
+      });
+    });
+    
+    // Filter by search term
+    searchInput.addEventListener('input', () => {
+      currentSearchEl.textContent = searchInput.value || 'none';
+      filterResources();
+    });
+    
+    // Combined filtering function
+    function filterResources() {
+      const searchTerm = searchInput.value.toLowerCase();
+      let visibleCount = 0;
+      
+      resourceCards.forEach(card => {
+        const cardContentType = card.getAttribute('data-content-type');
+        const cardTags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent);
+        const title = card.querySelector('.card-title').textContent.toLowerCase();
+        const description = card.querySelector('.card-description')?.textContent.toLowerCase() || '';
+        const tags = cardTags.map(tag => tag.toLowerCase());
+        
+        // Check content type match
+        const contentTypeMatch = activeContentType === 'all' || activeContentType === cardContentType;
+        
+        // Check tag match
+        const tagMatch = activeTag === 'all' || cardTags.includes(activeTag);
+        
+        // Check search match
+        const searchMatch = 
+          title.includes(searchTerm) || 
+          description.includes(searchTerm) || 
+          tags.some(tag => tag.includes(searchTerm));
+        
+        // Apply combined filtering
+        if (contentTypeMatch && tagMatch && searchMatch) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Update debug counter
+      if (visibleCountEl) {
+        visibleCountEl.textContent = visibleCount.toString();
+      }
+    }
+  });
+</script>

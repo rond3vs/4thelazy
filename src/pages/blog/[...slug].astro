@@ -1,19 +1,25 @@
 ---
 // src/pages/blog/[...slug].astro
 import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import BlogPostLayout from '../../layouts/BlogPostLayout.astro';
 
 // Generate static paths for all blog posts
 export async function getStaticPaths() {
   const blogEntries = await getCollection('blog');
-  return blogEntries.map(entry => ({
+  return blogEntries.map((entry: CollectionEntry<'blog'>) => ({
     params: { slug: entry.slug },
     props: { entry },
   }));
 }
 
+// Define interface for props
+interface Props {
+  entry: CollectionEntry<'blog'>;
+}
+
 // The entry prop is passed from getStaticPaths
-const { entry } = Astro.props;
+const { entry } = Astro.props as Props;
 const { Content } = await entry.render();
 ---
 

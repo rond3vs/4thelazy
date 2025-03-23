@@ -3,7 +3,7 @@ title: "Going freelance guide"
 description: "The essential steps to start freelancing without the usual stress"
 pubDate: 2025-03-10
 image: "/images/going-freelance.png"
-tags: ["Tips", "Advice", "Career"]
+tags: ["School"]
 type: "Tweet"
 ---
 

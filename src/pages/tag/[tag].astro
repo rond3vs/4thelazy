@@ -1,6 +1,7 @@
 ---
 // src/pages/tag/[tag].astro
 import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import MainLayout from '../../layouts/MainLayout.astro';
 import BlogResources from '../../components/BlogResources.astro';
 
@@ -8,16 +9,21 @@ export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
   
   // Get all unique tags
-  const uniqueTags = [...new Set(allPosts.map(post => post.data.tags).flat())];
+  const uniqueTags = [...new Set(allPosts.map((post: CollectionEntry<'blog'>) => post.data.tags).flat())] as string[];
   
   // Create a path for each tag
-  return uniqueTags.map(tag => ({
+  return uniqueTags.map((tag: string) => ({
     params: { tag: tag.toLowerCase() },
     props: { tag },
   }));
 }
 
-const { tag } = Astro.props;
+// Define props interface
+interface Props {
+  tag: string;
+}
+
+const { tag } = Astro.props as Props;
 ---
 
 <MainLayout>

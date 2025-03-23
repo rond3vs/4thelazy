@@ -3,7 +3,7 @@ title: "Freelance contracts: Dos and don'ts"
 description: "Protect your work with these essential contract tips"
 pubDate: 2025-03-01
 image: "/images/freelance-contracts.png"
-tags: ["Contracts", "Tips", "Advice"]
+tags: ["Cleaning"]
 type: "Article"
 ---
 
