@@ -2,41 +2,33 @@
 // src/components/ResourceItem.astro
 interface Props {
   title: string;
-  imageUrl: string;
   link: string;
   description: string;
   tags: string[];
   type: string;
   isSponsored?: boolean;
-  contentType: 'blog' | 'product'; // Added to identify the content type
+  contentType: 'blog' | 'product';
 }
 
-const { title, imageUrl, link, description, tags, type, isSponsored = false, contentType } = Astro.props;
+const { title, link, description, tags, type, isSponsored = false, contentType } = Astro.props;
 ---
 
-
-<div class="resource-card" data-content-type={contentType}>
-  <a href={link} class="card-link">
-    <div class="card-image">
-      {isSponsored && <div class="sponsored-badge">Sponsored</div>}
-      <img src={imageUrl} alt={title} loading="lazy" />
-    </div>
-    
-    <div class="card-content">
-      <div class="card-meta">
-        <div class="card-type">{type}</div>
-        <div class="card-content-type">{contentType === 'blog' ? 'Article' : 'Product'}</div>
+<div class="card resource-card" data-content-type={contentType}>
+  <a href={link}>
+    <div class="content">
+      <div class="meta">
+        <span class="type">{type}</span>
+        <span class="content-type">{contentType === 'blog' ? 'Article' : 'Product'}</span>
+        {isSponsored && <span class="sponsored">Sponsored</span>}
       </div>
       
-      <h3 class="card-title">{title}</h3>
+      <h3>{title}</h3>
       
-      {description && <p class="card-description">{description}</p>}
+      {description && <p>{description}</p>}
       
-      {tags && tags.length > 0 && (
-        <div class="card-tags">
-          {tags.map((tag: string) => (
-            <span class="tag">{tag}</span>
-          ))}
+      {tags?.length > 0 && (
+        <div class="tags">
+          {tags.map((tag) => <span>{tag}</span>)}
         </div>
       )}
     </div>
@@ -44,104 +36,85 @@ const { title, imageUrl, link, description, tags, type, isSponsored = false, con
 </div>
 
 <style>
-  .resource-card {
-    background-color: var(--color-white);
-    border-radius: var(--radius-lg);
+  
+  .card {
+    border-radius: 0.5rem;
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid #333333;
   }
   
-  .resource-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
-  .card-link {
+  a {
     display: block;
-    text-decoration: none;
     color: inherit;
+    text-decoration: none;
   }
   
-  .card-image {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    background-color: var(--color-background);
+  .content {
+    padding: 2rem;
   }
   
-  .card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .sponsored-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 4px 8px;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    font-size: 0.7rem;
-    border-radius: var(--radius-sm);
-    z-index: 1;
-  }
-  
-  .card-content {
-    padding: var(--spacing-md);
-  }
-  
-  .card-meta {
+  .meta {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: var(--spacing-sm);
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
     font-size: 0.8rem;
   }
   
-  .card-type {
-    display: inline-block;
-    padding: 2px 8px;
-    background-color: var(--color-background);
-    border-radius: var(--radius-sm);
+  .type {
+    padding: 0.1rem 0.4rem;
+    
+    border-radius: 0.25rem;
     font-weight: 600;
   }
   
-  .card-content-type {
+  .content-type {
     font-weight: 600;
-    color: var(--color-primary);
+    color: #4361ee;
   }
   
-  .card-title {
-    margin-bottom: var(--spacing-sm);
-    font-size: 1.2rem;
-    font-weight: 700;
+  .sponsored {
+    margin-left: auto;
+    padding: 0.1rem 0.4rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 0.25rem;
+    font-size: 0.7rem;
+  }
+  
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
     line-height: 1.4;
   }
   
-  .card-description {
-    margin-bottom: var(--spacing-md);
-    font-size: 0.9rem;
-    color: var(--color-text-light);
+  p {
+    margin: 0 0 0.75rem;
+    font-size: 0.85rem;
+    color: #6c757d;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   
-  .card-tags {
+  .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-xs);
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: #6c757d;
   }
   
-  .tag {
-    font-size: 0.8rem;
-    color: var(--color-text-light);
-  }
-  
-  .tag:not(:last-child):after {
+  .tags span:not(:last-child):after {
     content: "•";
-    margin-left: var(--spacing-xs);
-    color: var(--color-border);
+    margin-left: 0.25rem;
   }
 </style>

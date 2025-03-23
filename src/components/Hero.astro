@@ -4,149 +4,164 @@
 
 <section class="hero-section">
     <div class="container">
-      <h1 class="hero-title">
-        <span class="primary">Welcome to 4thelazy.com</span>
-        <span class="secondary">I find tools and tips for lazy people like you 🫵 (and me) | Middle ground for the productive and procrastinators 🤝</span>
-      </h1>
+      <h1 class="hero-title">WEBSITE FOR LAZY PEOPLE</h1>
       
-      <div class="subscribe-container">
-        <form class="subscribe-form" action="#" method="post">
-          <input 
-            type="email" 
-            name="email" 
-            id="email" 
-            placeholder="Your email" 
-            required
-            class="email-input"
-          />
-          <button type="submit" class="subscribe-button">
-            Subscribe
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 8L21 12L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <p class="hero-description">
+        Discover productivity hacks, time-saving tools, and clever shortcuts that help you accomplish more with minimal effort 👌
+      </p>
+      
+      <div class="newsletter-container">
+        <div class="newsletter-header">
+          <h2 class="newsletter-title">Subscribe to our newsletter</h2>
+        </div>
+        <form class="newsletter-form">
+          <div class="input-container">
+            <label for="email" class="visually-hidden">Email address</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="Your email" 
+              required 
+              class="email-input"
+            />
+          </div>
+          <button 
+            type="submit" 
+            class="subscribe-button"
+          >
+            <span>Get Weekly Hacks</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" class="arrow-icon">
+              <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </button>
         </form>
+        <p class="newsletter-description">
+          Weekly hacks, tools, and fast food tricks for people who want the win without the work 🍕
+        </p>
       </div>
-      
-      <p class="subscription-info">
-        Weekly hacks, tools, and fast food tricks for people who want the win without the work
-      </p>
     </div>
   </section>
   
   <style>
     .hero-section {
-      padding: 6rem 1rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      background-color: #F0F0F0;
+      background-color: var(--color-background);
+      padding: 4rem 2rem;
+      border-radius: 8px;
+      
     }
-    
+  
     .container {
-      max-width: 800px;
       margin: 0 auto;
+      text-align: center;
     }
-    
+  
     .hero-title {
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      line-height: 1.2;
-      margin-bottom: 3rem;
-      font-weight: 800;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    .primary {
-      color: #205A5D;
-    }
-    
-    .secondary {
-      color: #205A5D;
-      opacity: 0.8;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-    
-    .subscribe-container {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--color-primary);
       margin-bottom: 1rem;
     }
-    
-    .subscribe-form {
-      display: flex;
-      max-width: 500px;
+  
+    .hero-description {
+      font-size: 1.25rem;
+      color: var(--color-text);
+      margin-bottom: 2rem;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 50px auto;
+    }
+  
+    .newsletter-container {
+      max-width: 32rem;
       margin: 0 auto;
-      gap: 0.5rem;
+      text-align: center;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 1rem;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    
+  
+    .newsletter-header {
+      margin-bottom: 1rem;
+    }
+
+  
+    .newsletter-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+  
+    .input-container {
+      flex-grow: 1;
+    }
+  
     .email-input {
-      flex: 1;
-      padding: 1rem 1.5rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 9999px;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
       font-size: 1rem;
-      background-color: white;
     }
-    
+  
     .email-input:focus {
       outline: none;
-      border-color: #205A5D;
+      border-color: #2c6661;
+      box-shadow: 0 0 0 3px rgba(44, 102, 97, 0.2);
     }
-    
+  
     .subscribe-button {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      background-color: #2c6661;
+      color: white;
+      font-weight: 500;
       padding: 0.75rem 1.5rem;
       border: none;
-      border-radius: 9999px;
-      background-color: #205A5D;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease-in-out;
     }
-    
+  
     .subscribe-button:hover {
-      background-color: #184749;
+      background-color: #1e4e4a;
     }
-    
-    .subscription-info {
+  
+    .arrow-icon {
+      margin-left: 0.5rem;
+      fill: currentColor;
+    }
+  
+    .newsletter-description {
       font-size: 0.875rem;
-      color: #205A5D;
-      opacity: 0.8;
-      margin-top: 1rem;
+      color: #6b7280;
+      margin-top: 0.75rem;
     }
-    
-    @media (max-width: 640px) {
-      .hero-section {
-        padding: 4rem 1rem;
+  
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  
+    /* Media query for tablet and desktop */
+    @media (min-width: 640px) {
+      .hero-title {
+        font-size: 5rem;
       }
       
-      .subscribe-form {
-        flex-direction: column;
-      }
-      
-      .email-input, 
-      .subscribe-button {
-        width: 100%;
+      .newsletter-form {
+        flex-direction: row;
       }
     }
   </style>
-  
-  <script is:inline>
-    // You can add client-side form validation or submission logic here
-    document.querySelector('.subscribe-form')?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email')?.value;
-      
-      // Here you would typically send the email to your backend or newsletter service
-      console.log('Subscribing email:', email);
-      
-      // For now, just show a success message (you can replace this with real functionality)
-      alert('Thanks for subscribing!');
-    });
-  </script>
