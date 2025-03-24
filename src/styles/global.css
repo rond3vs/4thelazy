@@ -7,13 +7,13 @@
 
 :root {
     /* Color variables */
-    --color-primary: #205A5D;
+    --color-primary: #206A5D;
     --color-primary-dark: #184749;
     --color-primary-light: #2c7476;
     --color-background: #FFFFFF;
     --color-text: #333333;
     --color-text-light: #666666;
-    --color-white: #FFFFFF;
+    --color-white: #F2F0EF;
     --color-border: #205A5D;
     
     /* Typography */
@@ -46,6 +46,31 @@
     font-weight: 400;
     font-style: normal;
   }
+
+/* roboto-mono-300 - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../fonts/roboto-mono-300.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* roboto-mono-regular - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/roboto-mono-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* roboto-mono-700 - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/roboto-mono-700.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
   
   /* Base Styles */
   *, *::before, *::after {
@@ -56,9 +81,9 @@
   
   
   body {
-    font-family: 'Righteous', var(--font-sans);
+    font-family: 'Roboto Mono', var(--font-sans);
     color: var(--color-text);
-    background-color: var(--color-white);
+    background-color: var(--color-background);
     line-height: 1.5;
   }
   
@@ -66,13 +91,14 @@
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     color: var(--color-primary);
-    margin-bottom: var(--spacing-md);
+    
   }
   
   h1 {
     font-size: 1rem;
     font-family: 'Bungee Shade', var(--font-sans);
-    line-height: 1.2;
+    line-height: 1;
+    margin-bottom: var(--spacing-sm);
   }
   
   h2 {
@@ -208,7 +234,8 @@
     
     border-radius: var(--radius-md);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-sm);
+   
   }
   
   .card-title {
@@ -285,3 +312,31 @@
       width: 100%;
     }
   }
+
+
+/* List styling for blog content */
+.post-content ul,
+.post-content ol {
+  display: block;
+  list-style-position: outside;
+  padding-left: 3rem;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+
+.post-content ul {
+  list-style-type: disc;
+}
+
+.post-content ol {
+  list-style-type: decimal;
+}
+
+.post-content li {
+  display: list-item;
+  margin-bottom: 0.5rem;
+}
+
+.post-content li::marker {
+  color: var(--color-primary);
+}

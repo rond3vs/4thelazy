@@ -1,7 +1,7 @@
 ---
 // src/layouts/BlogPostLayout.astro
 import MainLayout from './MainLayout.astro';
-import { formatDate } from '../utils/formatDate'; // You'll need to create this utility
+import { formatDate } from '../utils/formatDate';
 
 interface Props {
   title: string;
@@ -11,41 +11,53 @@ interface Props {
   tags?: string[];
   type: string;
   isSponsored?: boolean;
+  description?: string;
 }
 
-const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.props;
+const { 
+  title, 
+  pubDate, 
+  updatedDate, 
+  image, 
+  tags, 
+  type, 
+  isSponsored,
+  description 
+} = Astro.props;
 ---
 
-<MainLayout>
+<MainLayout title={title} description={description}>
   <article class="blog-post">
     <div class="container">
-      {isSponsored && <div class="sponsored-badge">Sponsored</div>}
-      
-      <div class="post-header">
+      <header class="post-header">
+        {isSponsored && <div class="sponsored-badge">Sponsored</div>}
+        
         <div class="post-meta">
-          <div class="post-type">{type}</div>
+          <span class="post-type">{type}</span>
           <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
           {updatedDate && (
-            <div class="updated-date">
+            <span class="updated-date">
               Updated: <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
-            </div>
+            </span>
           )}
         </div>
         
         <h1 class="post-title">{title}</h1>
         
+        {description && <p class="post-description">{description}</p>}
+        
         {tags && tags.length > 0 && (
           <div class="post-tags">
             {tags.map((tag: string) => (
-              <a href={`/tag/${tag.toLowerCase()}`} class="tag">{tag}</a>
+              <a href={`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`} class="tag">#{tag}</a>
             ))}
           </div>
         )}
-      </div>
+      </header>
       
       {image && (
         <div class="post-image">
-          <img src={image} alt={title} />
+          <img src={image} alt={title} loading="eager" />
         </div>
       )}
       
@@ -53,42 +65,49 @@ const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.pr
         <slot />
       </div>
       
-      <div class="post-footer">
+      <footer class="post-footer">
         <a href="/" class="btn btn-primary">← Back to All Resources</a>
-      </div>
+      </footer>
     </div>
   </article>
 </MainLayout>
 
 <style>
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+  
   .blog-post {
     padding: var(--spacing-xl) 0;
   }
   
-  .container {
-    max-width: 800px;
+  .post-header {
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
   }
   
   .sponsored-badge {
     display: inline-block;
     padding: var(--spacing-xs) var(--spacing-sm);
-    background-color: var(--color-background);
-    color: var(--color-text-light);
+    background-color: var(--color-primary);
+    color: var(--color-white);
     font-size: 0.8rem;
     font-weight: 600;
     border-radius: var(--radius-sm);
     margin-bottom: var(--spacing-md);
-  }
-  
-  .post-header {
-    margin-bottom: var(--spacing-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   
   .post-meta {
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
     font-size: 0.9rem;
     color: var(--color-text-light);
   }
@@ -96,26 +115,46 @@ const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.pr
   .post-type {
     display: inline-block;
     padding: 2px 8px;
-    background-color: var(--color-background);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-primary);
     border-radius: var(--radius-sm);
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+    color: var(--color-primary);
   }
   
   .post-title {
     font-size: 2.5rem;
+    line-height: 1.2;
     margin-bottom: var(--spacing-md);
+    font-weight: 700;
+    font-family: 'Bungee Shade', var(--font-sans);
+    color: var(--color-primary);
+  }
+  
+  .post-description {
+    font-size: 1.2rem;
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-md);
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .post-tags {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-sm);
+    justify-content: center;
   }
   
   .tag {
     font-size: 0.9rem;
     color: var(--color-text-light);
     text-decoration: none;
+    transition: color 0.2s ease;
   }
   
   .tag:hover {
@@ -123,9 +162,10 @@ const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.pr
   }
   
   .post-image {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   }
   
   .post-image img {
@@ -136,35 +176,144 @@ const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.pr
   
   .post-content {
     font-size: 1.1rem;
-    line-height: 1.7;
+    line-height: 1.8;
   }
   
-  .post-content h1,
-  .post-content h2,
-  .post-content h3,
-  .post-content h4 {
+  .post-content h1 {
+    font-size: 2.2rem;
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 700;
+    font-family: 'Roboto Mono', var(--font-sans);
+    color: var(--color-primary);
+  }
+  
+  .post-content h2 {
+    font-size: 1.8rem;
     margin-top: var(--spacing-lg);
     margin-bottom: var(--spacing-md);
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: 'Roboto Mono', var(--font-sans);
+  }
+  
+  .post-content h3 {
+    font-size: 1.4rem;
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  
+  .post-content h4 {
+    font-size: 1.2rem;
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
   }
   
   .post-content p {
     margin-bottom: var(--spacing-md);
+    font-family: 'Roboto Mono', var(--font-sans);
   }
   
   .post-content ul,
   .post-content ol {
-    margin-bottom: var(--spacing-md);
-    padding-left: var(--spacing-lg);
+    display: block !important;
+    list-style-position: outside !important;
+    padding-left: 3rem !important;
+    margin-bottom: var(--spacing-lg) !important;
+  }
+
+.post-content ul {
+  list-style-type: disc;
+}
+
+.post-content ol {
+  list-style-type: decimal;
+}
+  .post-content li {
+    display: list-item;
+    margin-bottom: var(--spacing-sm);
   }
   
-  .post-content li {
-    margin-bottom: var(--spacing-xs);
+  .post-content li strong {
+    color: var(--color-primary);
+  }
+  
+  .post-content li::marker {
+    color: var(--color-primary);
+  }
+  
+  .post-content a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease;
+  }
+  
+  .post-content a:hover {
+    color: var(--color-primary-dark);
+  }
+  
+  .post-content blockquote {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-left: 4px solid var(--color-primary);
+    background-color: var(--color-white);
+    font-style: italic;
+    border-radius: var(--radius-sm);
+  }
+  
+  .post-content code {
+    background-color: var(--color-white);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9em;
+    color: var(--color-primary-dark);
+  }
+  
+  .post-content pre {
+    background-color: var(--color-primary-dark);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+  }
+  
+  .post-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: var(--color-white);
   }
   
   .post-footer {
     margin-top: var(--spacing-xl);
     padding-top: var(--spacing-lg);
     border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: center;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+    text-decoration: none;
   }
   
   @media (max-width: 768px) {
@@ -172,8 +321,24 @@ const { title, pubDate, updatedDate, image, tags, type, isSponsored } = Astro.pr
       font-size: 2rem;
     }
     
+    .post-description {
+      font-size: 1.1rem;
+    }
+    
     .post-content {
       font-size: 1rem;
+    }
+    
+    .post-content h1 {
+      font-size: 1.8rem;
+    }
+    
+    .post-content h2 {
+      font-size: 1.5rem;
+    }
+    
+    .post-content h3 {
+      font-size: 1.3rem;
     }
   }
 </style>
