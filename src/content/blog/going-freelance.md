@@ -2,14 +2,11 @@
 title: "Going freelance guide"
 description: "The essential steps to start freelancing without the usual stress"
 pubDate: 2025-03-10
-image: "/images/going-freelance.png"
+
 tags: ["School"]
 type: "Tweet"
 ---
 
-# Going freelance guide
-
-Thinking about freelancing but don't want the hassle? Here's how to make the transition as painless as possible.
 
 ## Step 1: Start part-time
 

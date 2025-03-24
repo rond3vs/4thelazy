@@ -2,14 +2,11 @@
 title: "Freelance contracts: Dos and don'ts"
 description: "Protect your work with these essential contract tips"
 pubDate: 2025-03-01
-image: "/images/freelance-contracts.png"
+
 tags: ["Cleaning"]
 type: "Article"
 ---
 
-# Freelance contracts: Dos and don'ts
-
-As a lazy freelancer, you don't want to waste time dealing with contract issues. Here's the straightforward advice you need.
 
 ## The Dos
 

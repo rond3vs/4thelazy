@@ -20,8 +20,23 @@ interface Props {
 // The entry prop is passed from getStaticPaths
 const { entry } = Astro.props as Props;
 const { Content } = await entry.render();
+
+// Transform entry.data to match ProductPostLayout props
+const productLayoutProps = {
+  title: entry.data.title,
+  publishDate: entry.data.pubDate, // Map pubDate to publishDate
+  updatedDate: entry.data.updatedDate,
+  image: entry.data.image,
+  categories: entry.data.categories,
+  description: entry.data.description,
+  // You need to provide a productType
+  productType: entry.data.productType || "Product", // Fallback if not present
+  // Optional props
+  isRecommended: entry.data.isSponsored, // Using isSponsored as isRecommended if that makes sense
+  affiliateUrl: entry.data.affiliateUrl, // This appears missing in your error
+};
 ---
 
-<ProductPostLayout {...entry.data}>
+<ProductPostLayout {...productLayoutProps}>
   <Content />
 </ProductPostLayout>
