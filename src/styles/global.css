@@ -10,9 +10,9 @@
     --color-primary: #206A5D;
     --color-primary-dark: #184749;
     --color-primary-light: #2c7476;
-    --color-background: #FFFFFF;
+    --color-background: #FAF8F5;
     --color-text: #333333;
-    --color-text-light: #666666;
+    --color-text-light: #030202;
     --color-white: #F2F0EF;
     --color-border: #205A5D;
     
@@ -150,7 +150,7 @@
   
   /* Header & Navigation */
   header {
-    background-color: var(--color-white);
+   
     border-bottom: 1px solid var(--color-border);
     padding: var(--spacing-md) 0;
   }

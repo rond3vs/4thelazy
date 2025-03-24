@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import ProductPostLayout from '../../layouts/ProductPostLayout.astro';
+
+// Generate static paths for all product posts
+export async function getStaticPaths() {
+  const productEntries = await getCollection('products');
+  return productEntries.map((entry: CollectionEntry<'products'>) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+// Define interface for props
+interface Props {
+  entry: CollectionEntry<'products'>;
+}
+
+// The entry prop is passed from getStaticPaths
+const { entry } = Astro.props as Props;
+const { Content } = await entry.render();
+---
+
+<ProductPostLayout {...entry.data}>
+  <Content />
+</ProductPostLayout>
