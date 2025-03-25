@@ -9,7 +9,7 @@ import Newsletter from './Newsletter.astro';
       <h1 class="hero-title">4THELAZY.COM</h1>
       
       <p class="hero-description">
-        I find tools and tips for lazy people like you 🫵 (and me). From fast food hacks to ways to be more productive.
+        Scroll down to find tools and tips for lazy people like you 🫵 (and me). From fast food hacks to ways to be more productive.
       </p>
       
       <Newsletter />
@@ -18,8 +18,7 @@ import Newsletter from './Newsletter.astro';
   
   <style>
     .hero-section {
-      padding: 4rem 2rem;
-      height: 100vh;
+      padding: 4rem 1rem;
       margin-top: 5rem;
     }
   
@@ -39,7 +38,7 @@ import Newsletter from './Newsletter.astro';
     }
   
     .hero-title {
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 4vw, 2rem);
       font-weight: bold;
       color: var(--color-primary);
       
@@ -139,7 +138,7 @@ import Newsletter from './Newsletter.astro';
     /* Media query for tablet and desktop */
     @media (min-width: 640px) {
       .hero-title {
-        font-size: 5rem;
+        font-size: clamp(2rem, 4vw, 5rem);
       }
       
       .newsletter-form {
