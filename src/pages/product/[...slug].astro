@@ -29,13 +29,12 @@ const productLayoutProps = {
   image: entry.data.image,
   categories: entry.data.categories,
   description: entry.data.description,
-  // You need to provide a productType
   productType: entry.data.productType || "Product", // Fallback if not present
-  // Optional props
-  isRecommended: entry.data.isSponsored, // Using isSponsored as isRecommended if that makes sense
-  affiliateUrl: entry.data.affiliateUrl, // This appears missing in your error
+  isRecommended: entry.data.isSponsored,
 };
 ---
+
+<!-- Optional comment here: product [...slug].astro -->
 
 <ProductPostLayout {...productLayoutProps}>
   <Content />
