@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Get the current path
+    const path = window.location.pathname;
+    // Remove the base path (/4thelazy) if present
+    const relativePath = path.replace(/^\/4thelazy/, '');
+    // Redirect to the root with a hash for SPA routing
+    window.location.href = '/4thelazy/#' + relativePath;
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
