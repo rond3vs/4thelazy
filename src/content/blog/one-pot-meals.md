@@ -17,6 +17,7 @@ isSponsored: false
 ## Weeknight Heroes
 
 ### Slow Cooker Pulled Pork
+
 Dump pork shoulder, BBQ sauce, onions, and spices in your slow cooker. Set for 8 hours on low. Shred with forks when done. That's 8 episodes of anything you want.
 
 ### Dutch Oven Chicken Thighs

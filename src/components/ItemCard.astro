@@ -28,7 +28,9 @@ const { title, link, description, tags, type, isSponsored = false, contentType }
       
       {tags?.length > 0 && (
         <div class="tags">
-          {tags.map((tag) => <span>{tag}</span>)}
+          {tags.map((tag) => (
+            <span class="tag" data-tag={tag}>{tag}</span>
+          ))}
         </div>
       )}
     </div>
@@ -91,13 +93,13 @@ const { title, link, description, tags, type, isSponsored = false, contentType }
   
   h3 {
     margin: 0 0 0.5rem;
-    font-size: 1.1rem;
+    font-size: 1.35rem;
     line-height: 1.4;
   }
   
   p {
     margin: 0 0 0.75rem;
-    font-size: 0.85rem;
+    font-size: 1.2rem;
     color: #6c757d;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -113,8 +115,17 @@ const { title, link, description, tags, type, isSponsored = false, contentType }
     color: #6c757d;
   }
   
+  /* Remove the bullet separator and make each tag distinct */
+  .tags span {
+    padding: 0.15rem 0.35rem;
+    background: rgba(67, 97, 238, 0.1);
+    border-radius: 0.25rem;
+    margin-right: 0.25rem;
+  }
+  
+  /* Remove the bullet after each tag */
   .tags span:not(:last-child):after {
-    content: "•";
-    margin-left: 0.25rem;
+    content: "";
+    margin-left: 0;
   }
 </style>

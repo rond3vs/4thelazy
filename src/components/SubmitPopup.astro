@@ -1,0 +1,213 @@
+---
+// SubmitPopup.astro
+---
+
+<div id="submitPopup" class="popup-overlay">
+    <div class="popup-content">
+      <div class="popup-header">
+        <h2>Submit a resource</h2>
+        <button id="closePopup" class="close-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <p class="popup-description">
+        Submit a resource for other freelancers. If we like it too, we'll feature it on Freelance Things.
+      </p>
+      <form id="submitForm" class="popup-form">
+        <div class="form-field">
+          <input type="url" id="resourceLink" placeholder="Resource link" required>
+        </div>
+        <div class="form-field">
+          <input type="email" id="emailAddress" placeholder="Your email address" required>
+        </div>
+        <div class="form-field checkbox-field">
+          <input type="checkbox" id="subscribeCheckbox">
+          <label for="subscribeCheckbox">Subscribe to the weekly email</label>
+        </div>
+        <button type="submit" class="submit-btn">
+          Submit
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 8L21 12L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <style>
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+  
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  
+    .popup-content {
+      background-color: var(--color-background, #FAF8F5);
+      border-radius: var(--radius-md, 0.5rem);
+      padding: var(--spacing-lg, 2rem);
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+  
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md, 1rem);
+    }
+  
+    .popup-header h2 {
+      font-family: var(--font-primary, 'Roboto Mono', sans-serif);
+      font-size: clamp(1.5rem, 4vw, 1.7rem);
+      font-weight: 700;
+      margin: 0;
+      color: var(--color-primary, #206A5D);
+    }
+  
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--spacing-xs, 0.25rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text, #333333);
+    }
+  
+    .popup-description {
+      margin-bottom: var(--spacing-lg, 2rem);
+      color: var(--color-text-light, #030202);
+      font-family: var(--font-primary, 'Roboto Mono', sans-serif);
+      font-size: clamp(1rem, 1.2vw, 1.2rem);
+    }
+  
+    .popup-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md, 1rem);
+    }
+  
+    .form-field input[type="url"],
+    .form-field input[type="email"] {
+      width: 100%;
+      padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+      border: 1px solid var(--color-border, #205A5D);
+      border-radius: var(--radius-sm, 0.25rem);
+      font-family: var(--font-primary, 'Roboto Mono', sans-serif);
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      background-color: var(--color-white, #F2F0EF);
+    }
+  
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm, 0.5rem);
+    }
+  
+    .checkbox-field label {
+      font-family: var(--font-primary, 'Roboto Mono', sans-serif);
+      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+      color: var(--color-text, #333333);
+    }
+  
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+      background-color: var(--color-primary, #206A5D);
+      border: 1px solid var(--color-primary, #206A5D);
+      border-radius: var(--radius-sm, 0.25rem);
+      font-family: var(--font-primary, 'Roboto Mono', sans-serif);
+      font-weight: 700;
+      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+      color: var(--color-white, #F2F0EF);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      gap: var(--spacing-xs, 0.25rem);
+    }
+  
+    .submit-btn:hover {
+      background-color: var(--color-primary-dark, #184749);
+      border-color: var(--color-primary-dark, #184749);
+    }
+  
+    .submit-btn svg {
+      stroke: currentColor;
+    }
+  
+    @media (max-width: 768px) {
+      .popup-content {
+        padding: var(--spacing-md, 1rem);
+        width: 95%;
+      }
+    }
+  </style>
+  
+  <script is:inline>
+    // The popup component script
+    document.addEventListener('DOMContentLoaded', () => {
+      const closePopup = document.getElementById('closePopup');
+      const submitPopup = document.getElementById('submitPopup');
+      const submitForm = document.getElementById('submitForm');
+  
+      // Close popup when close button is clicked
+      closePopup.addEventListener('click', () => {
+        submitPopup.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+  
+      // Close popup when clicking outside content area
+      submitPopup.addEventListener('click', (e) => {
+        if (e.target === submitPopup) {
+          submitPopup.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+  
+      // Form submission logic
+      submitForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const resourceLink = document.getElementById('resourceLink').value;
+        const emailAddress = document.getElementById('emailAddress').value;
+        const subscribeCheckbox = document.getElementById('subscribeCheckbox').checked;
+        
+        // Handle form submission - you can replace this with your actual submission logic
+        console.log('Form submitted:', { resourceLink, emailAddress, subscribeToNewsletter: subscribeCheckbox });
+        
+        // Optional: Show success message or reset form
+        alert('Resource submitted successfully!');
+        submitForm.reset();
+        submitPopup.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+  
+    // Expose a function to open the popup that can be called from other components
+    window.openSubmitPopup = function() {
+      const submitPopup = document.getElementById('submitPopup');
+      submitPopup.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+  </script>

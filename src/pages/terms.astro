@@ -1,0 +1,106 @@
+---
+// terms.astro
+import MainLayout from '../layouts/MainLayout.astro';
+
+const today = new Date();
+const effectiveDate = today.toLocaleDateString(undefined, {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+<MainLayout>
+  <section class="legal">
+    <h1>Terms and Conditions</h1>
+    <p>Effective Date: {effectiveDate}</p>
+
+    <h2>1. Acceptance of Terms</h2>
+    <p>
+      Welcome to 4thelazy.com ("Website"). By accessing or using this Website, you agree to be bound by these Terms and Conditions ("Terms"). If you do not agree with these Terms, please do not use our Website.
+    </p>
+
+    <h2>2. Use of the Website</h2>
+    <p>
+      The content provided on 4thelazy.com is for informational purposes only. We reserve the right to modify or discontinue, temporarily or permanently, the Website or any part thereof without prior notice.
+    </p>
+
+    <h2>3. Intellectual Property</h2>
+    <p>
+      All content, including text, graphics, logos, images, and other material on the Website, is the property of 4thelazy.com or its content suppliers and is protected by copyright and other intellectual property laws. You may not reproduce, distribute, or create derivative works from our content without our express written permission.
+    </p>
+
+    <h2>4. User Conduct</h2>
+    <p>
+      You agree to use the Website only for lawful purposes and in a manner that does not infringe the rights of, restrict or inhibit anyone else's use and enjoyment of the Website. Prohibited behavior includes harassing others, transmitting offensive content, or disrupting the operation of the Website.
+    </p>
+
+    <h2>5. Disclaimer of Warranties</h2>
+    <p>
+      The Website is provided on an "as is" and "as available" basis. 4thelazy.com makes no representations or warranties of any kind, express or implied, regarding the operation of the Website or the information, content, materials, or products included on this site. We do not warrant that the Website will be uninterrupted or error-free.
+    </p>
+
+    <h2>6. Limitation of Liability</h2>
+    <p>
+      In no event shall 4thelazy.com, its owners, or its affiliates be liable for any direct, indirect, incidental, special, or consequential damages arising out of or in connection with your use of the Website.
+    </p>
+
+    <h2>7. External Links</h2>
+    <p>
+      Our Website may contain links to third-party websites or services that are not owned or controlled by 4thelazy.com. We are not responsible for the content or practices of these third-party sites.
+    </p>
+
+    <h2>8. Changes to These Terms</h2>
+    <p>
+      4thelazy.com reserves the right to update or modify these Terms at any time without prior notice. Your continued use of the Website after any such changes constitutes your acceptance of the new Terms.
+    </p>
+
+    <h2>9. Governing Law</h2>
+    <p>
+      These Terms shall be governed and construed in accordance with the laws of Texas, without regard to its conflict of law provisions.
+    </p>
+
+    <h2>10. Contact Us</h2>
+    <p>
+      If you have any questions about these Terms, please contact us at: 4tl@4thelazy.com.
+    </p>
+  </section>
+</MainLayout>
+
+<style>
+    .legal {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.legal h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-primary);
+}
+
+.legal h2 {
+  font-size: clamp(1.5rem, 2vw, 1.8rem);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+}
+
+.legal p {
+  margin-bottom: var(--spacing-md);
+}
+
+.legal a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.legal a:hover {
+  color: var(--color-primary-dark);
+}
+</style>

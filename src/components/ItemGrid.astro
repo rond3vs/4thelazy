@@ -121,7 +121,7 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
 
 <section class="resources-section">
   <div class="container">
-    <h2 class="section-title">Look around. Stay Awhile</h2>
+    <h2 class="section-title">Look around. Stay Awhile. 🤩</h2>
     <p class="section-description">Explore our latest articles and tools to help you stay informed and productive.</p>
     
     {debug && (
@@ -164,6 +164,18 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
           Shuffle
         </button>
       </div>
+      
+      <!-- Tags filter - NEW SECTION -->
+      <div class="tags-filter">
+        <h3 class="filter-title">Filter by tags</h3>
+        <div class="filter-tabs" id="tag-filters">
+          <button class="filter-tab active" data-tag="all">All Tags</button>
+          {allTags.map((tagName) => (
+            <button class="filter-tab" data-tag={tagName}>{tagName}</button>
+          ))}
+        </div>
+      </div>
+    </div>
 
     <!-- Resource cards grid -->
     <div class="resources-grid" id="resources-container">
@@ -171,7 +183,6 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
         filteredResources.map((resource) => (
           <ItemCard 
             title={resource.title}
-
             link={`/${resource.type}/${resource.slug}`}
             description={resource.description}
             tags={resource.tags}
@@ -208,14 +219,7 @@ isSponsored: false
       </div>
     )}
     
-    <div id="filter-debug" class="filter-debug">
-      <h3>Current Filter State:</h3>
-      <p>Content Type: <span id="current-content-type">all</span></p>
-      <p>Tag: <span id="current-tag">all</span></p>
-      <p>Search Term: <span id="current-search"></span></p>
-      <p>Visible Items: <span id="visible-count">{totalResources}</span></p>
-    </div>
-  </div>
+   
 </section>
 
 <style>
@@ -231,9 +235,10 @@ isSponsored: false
   .section-description {
     text-align: center;
     margin-bottom: var(--spacing-lg);
+    max-width: 600px;
+    margin: 0 auto var(--spacing-lg);
   }
 
-  
   .filter-container {
     margin-bottom: var(--spacing-lg);
   }
@@ -264,7 +269,6 @@ isSponsored: false
     justify-content: center;
     gap: var(--spacing-xs);
     margin-bottom: var(--spacing-md);
-   
   }
   
   .content-type-tab,
@@ -291,6 +295,30 @@ isSponsored: false
     background-color: var(--color-white);
     color: var(--color-primary);
   }
+
+  /* Tags Filter - NEW STYLES */
+  .tags-filter {
+    margin-top: var(--spacing-md);
+  }
+  
+  .filter-title {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-light);
+  }
+  
+  /* Make the tags filter horizontally scrollable on smaller screens */
+  .filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
   
   .resources-grid {
     display: grid;
@@ -298,7 +326,7 @@ isSponsored: false
     gap: var(--spacing-sm);
     max-width: 100%;
     margin: 0 auto;
-    width: 80%;
+    width: 100%;
   }
   
   .no-resources {
@@ -343,7 +371,6 @@ isSponsored: false
     border-radius: var(--radius-md);
     font-family: monospace;
     display: none;
-
   }
   
   @media (max-width: 992px) {
@@ -376,7 +403,6 @@ isSponsored: false
       white-space: nowrap;
     }
   }
-
   
   /* Add these new styles for the shuffle button and animations */
   .shuffle-button {
@@ -413,8 +439,6 @@ isSponsored: false
     opacity: 1;
     transition: all 0.3s ease-in-out;
   }
-  
-  /* Existing media queries... */
 </style>
 
 <script is:inline>
@@ -422,7 +446,7 @@ isSponsored: false
   // Get elements
   const contentTypeTabs = document.querySelectorAll('.content-type-tab');
   const filterTabs = document.querySelectorAll('.filter-tab');
-  const resourceCards = document.querySelectorAll('.card');
+  const resourceCards = document.querySelectorAll('.card.resource-card');
   const searchInput = document.getElementById('resource-search');
   const shuffleButton = document.querySelector('.shuffle-button');
   const resourcesContainer = document.getElementById('resources-container');
@@ -432,10 +456,29 @@ isSponsored: false
   const currentTagEl = document.getElementById('current-tag');
   const currentSearchEl = document.getElementById('current-search');
   const visibleCountEl = document.getElementById('visible-count');
+  const filterDebug = document.getElementById('filter-debug');
+  
+  // Enable debug display temporarily
+  if (filterDebug) {
+    filterDebug.style.display = 'block';
+  }
   
   let activeContentType = 'all';
   let activeTag = 'all';
   let isShuffled = false;
+  
+  // Debug log all available tags
+  console.log("=== RESOURCE FILTERING DEBUG ===");
+  console.log(`Found ${resourceCards.length} resource cards total`);
+  
+  resourceCards.forEach(card => {
+    const title = card.querySelector('h3')?.textContent || 'Unknown';
+    const contentType = card.getAttribute('data-content-type');
+    const tagElements = card.querySelectorAll('.tags span');
+    const tags = Array.from(tagElements).map(tag => tag.textContent.trim());
+    
+    console.log(`Card: "${title}", Type: ${contentType}, Tags: [${tags.join(', ')}]`);
+  });
   
   // Filter by content type
   contentTypeTabs.forEach(tab => {
@@ -455,7 +498,8 @@ isSponsored: false
       tab.classList.add('active');
       
       activeContentType = tab.getAttribute('data-type');
-      currentContentTypeEl.textContent = activeContentType;
+      if (currentContentTypeEl) currentContentTypeEl.textContent = activeContentType;
+      console.log(`Content type filter changed to: ${activeContentType}`);
       filterResources();
     });
   });
@@ -463,19 +507,22 @@ isSponsored: false
   // Filter by tag/category
   filterTabs.forEach(tab => {
     tab.addEventListener('click', () => {
+      console.log(`Tag tab clicked: ${tab.textContent} with data-tag=${tab.getAttribute('data-tag')}`);
+      
       // Update active tab
       filterTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       
       activeTag = tab.getAttribute('data-tag');
-      currentTagEl.textContent = activeTag;
+      if (currentTagEl) currentTagEl.textContent = activeTag;
+      console.log(`Tag filter changed to: ${activeTag}`);
       filterResources();
     });
   });
   
   // Filter by search term
   searchInput.addEventListener('input', () => {
-    currentSearchEl.textContent = searchInput.value || 'none';
+    if (currentSearchEl) currentSearchEl.textContent = searchInput.value || 'none';
     filterResources();
   });
   
@@ -484,6 +531,8 @@ isSponsored: false
     const visibleCards = Array.from(resourceCards).filter(card => 
       card.style.display !== 'none'
     );
+    
+    console.log(`Shuffling ${visibleCards.length} visible cards`);
     
     // Fisher-Yates shuffle algorithm
     for (let i = visibleCards.length - 1; i > 0; i--) {
@@ -522,31 +571,53 @@ isSponsored: false
     const searchTerm = searchInput.value.toLowerCase();
     let visibleCount = 0;
     
+    console.log(`=== FILTERING RESOURCES ===`);
+    console.log(`Active content type: ${activeContentType}`);
+    console.log(`Active tag: ${activeTag}`);
+    console.log(`Search term: ${searchTerm}`);
+    
     resourceCards.forEach(card => {
+      // Get the card's content type
       const cardContentType = card.getAttribute('data-content-type');
-      const cardTags = Array.from(card.querySelectorAll('.tags span')).map(tag => tag.textContent);
-      const title = card.querySelector('h3').textContent.toLowerCase();
+      
+      // Get the card's title for debugging
+      const title = card.querySelector('h3')?.textContent || 'Unknown';
+      
+      // Get tags from the card - using our specific markup
+      const tagElements = card.querySelectorAll('.tags span');
+      const tags = Array.from(tagElements).map(tag => tag.textContent.trim().toLowerCase());
+      
+      // Debug this card
+      console.log(`Checking card: "${title}", Type: ${cardContentType}, Tags: [${tags.join(', ')}]`);
+      
+      // For search, get title and description
       const description = card.querySelector('p')?.textContent.toLowerCase() || '';
-      const tags = cardTags.map(tag => tag.toLowerCase());
       
       // Check content type match
       const contentTypeMatch = activeContentType === 'all' || activeContentType === cardContentType;
       
       // Check tag match
-      const tagMatch = activeTag === 'all' || cardTags.includes(activeTag);
+      const tagMatch = activeTag === 'all' || tags.includes(activeTag.toLowerCase());
       
       // Check search match
-      const searchMatch = 
-        title.includes(searchTerm) || 
-        description.includes(searchTerm) || 
-        tags.some(tag => tag.includes(searchTerm));
+      const searchMatch = searchTerm === '' || 
+                         title.toLowerCase().includes(searchTerm) || 
+                         description.includes(searchTerm) || 
+                         tags.some(tag => tag.includes(searchTerm));
+      
+      // Log the matching results
+      console.log(`- Content type match: ${contentTypeMatch}`);
+      console.log(`- Tag match: ${tagMatch} (looking for "${activeTag}" in [${tags.join(', ')}])`);
+      console.log(`- Search match: ${searchMatch}`);
       
       // Apply combined filtering
       if (contentTypeMatch && tagMatch && searchMatch) {
-        card.style.display = 'block';
+        card.style.display = '';
         visibleCount++;
+        console.log(`✅ Card "${title}" PASSED all filters`);
       } else {
         card.style.display = 'none';
+        console.log(`❌ Card "${title}" FAILED filtering`);
       }
     });
     
@@ -560,6 +631,18 @@ isSponsored: false
     if (visibleCountEl) {
       visibleCountEl.textContent = visibleCount.toString();
     }
+    
+    console.log(`=== FILTERING COMPLETE: ${visibleCount} visible items ===`);
+    
+    // Show a message if no results are found
+    const noResultsEl = document.querySelector('.no-resources');
+    if (noResultsEl) {
+      noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
   }
+  
+  // Initialize filtering on load
+  console.log("Initializing resource filtering...");
+  filterResources();
 });
 </script>

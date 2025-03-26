@@ -1,0 +1,76 @@
+---
+// src/components/Footer.astro
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <div class="copyright">
+        &copy; {currentYear} 4thelazy.com • All rights reserved
+      </div>
+      
+      <div class="footer-legal">
+        <a href="/privacy-policy">Privacy</a>
+        <span class="divider">|</span>
+        <a href="/terms">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
+    padding: var(--spacing-md) 0;
+    margin-top: var(--spacing-xl);
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+  
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  
+  .copyright {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .footer-legal {
+    font-size: 0.9rem;
+  }
+  
+  .footer-legal a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .footer-legal a:hover {
+    color: var(--color-white);
+  }
+  
+  .divider {
+    margin: 0 var(--spacing-xs);
+    color: rgba(255, 255, 255, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    .footer-bottom {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: var(--spacing-sm);
+    }
+  }
+</style>

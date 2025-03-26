@@ -1,0 +1,67 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+
+// Create a new Date object and format it as "Month Day, Year"
+const today = new Date();
+const effectiveDate = today.toLocaleDateString(undefined, {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<MainLayout>
+  <section class="legal">
+    <h1>Privacy Policy</h1>
+    <p>Effective Date: {effectiveDate}</p>
+
+    <h2>1. Information We Collect</h2>
+    <p>We collect the following personal information: <strong>Email address</strong> (submitted via newsletter signup or contact form). We do not collect sensitive data like credit card information, physical addresses, or data from third-party sources.</p>
+
+    <h2>2. How We Collect Information</h2>
+    <p>We collect email addresses through our newsletter signup forms and contact forms. We do not currently use cookies or tracking technologies.</p>
+
+    <h2>3. How We Use Your Information</h2>
+    <p>Your email is used to send newsletters and respond to inquiries submitted via our contact form. We do not sell or share your personal information with third parties.</p>
+
+    <h2>4. Where Your Data is Stored</h2>
+    <p>Emails are securely stored using the Beehiiv newsletter platform.</p>
+
+    <h2>5. Your Choices and Rights</h2>
+    <p>You can unsubscribe from our emails at any time via the unsubscribe link provided in every newsletter. You may also request removal of your email address by contacting us directly.</p>
+
+    <h2>6. Children's Privacy</h2>
+    <p>Our content is suitable for general audiences, including children under 13. However, we do not knowingly collect any personal information from children under 13.</p>
+
+    <h2>7. Legal Compliance</h2>
+    <p>We aim to comply with privacy regulations including GDPR and CCPA. You have the right to request access to or deletion of your personal data in accordance with these laws.</p>
+
+    <h2>8. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy periodically. If changes are made, the effective date will be updated accordingly.</p>
+
+    <h2>9. Contact</h2>
+    <p>If you have any questions about this Privacy Policy, please contact us at: 4tl@4thelazy.com</p>
+  </section>
+</MainLayout>
+
+<style>
+    .legal {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.legal h2 {
+  font-size: clamp(1.5rem, 2vw, 1.8rem);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+}
+
+.legal p {
+  margin-bottom: var(--spacing-md);
+}
+</style>

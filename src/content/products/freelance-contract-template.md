@@ -7,10 +7,6 @@ categories: ["Money"]
 isSponsored: false
 ---
 
-# Freelance Contract Template
-
-This contract template has been designed specifically for freelance professionals looking to establish clear agreements with their clients.
-
 ## What's Included
 
 - Comprehensive terms and conditions

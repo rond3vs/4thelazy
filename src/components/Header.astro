@@ -1,80 +1,106 @@
 ---
 // Header.astro
+import SubmitPopup from './SubmitPopup.astro';
 ---
 
 <header>
-    <div class="container">
-      <div class="logo">
-        <a href="/">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="currentColor"/>
-            <path d="M15 8H9V16H15V8Z" fill="currentColor"/>
-          </svg>
-          <span>4tl</span>
-        </a>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="/about">About</a></li>
-          <li><a href="/submit" class="btn btn-primary">Submit <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 8L21 12L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
-        </ul>
-      </nav>
+  <div class="container">
+    <div class="logo">
+      <a href="/">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="currentColor"/>
+          <path d="M15 8H9V16H15V8Z" fill="currentColor"/>
+        </svg>
+        <span>4tl</span>
+      </a>
     </div>
-  </header>
+    <nav>
+      <ul>
+        <li><a href="/about">About</a></li>
+        <li><a href="#" id="submitBtn" class="btn">Submit <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 8L21 12L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Include the Submit Popup component -->
+<SubmitPopup />
+
+<style>
+  header {
+    padding: 1rem 0;
+  }
   
-  <style>
-    header {
-      padding: 1rem 0;
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+  
+  nav ul {
+    gap: 1rem;
+    list-style: none;
+    display: flex;
+    align-items: center;
+  }
+  
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.25rem;
+    background-color: var(--color-background);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+  }
+  
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .btn svg {
+    margin-left: var(--spacing-xs, 0.25rem);
+  }
+  
+  @media (max-width: 768px) {
+    nav ul {
+      gap: 1rem;
     }
-    
+  }
+  
+  @media (max-width: 640px) {
     .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .logo a {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 600;
-      font-size: 1.25rem;
+      flex-direction: column;
+      gap: 1rem;
     }
     
     nav ul {
-      gap: 1rem;
-      list-style: none;
-      display: flex;
-      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
     }
+  }
+</style>
+
+<script is:inline>
+  // Add event listener to the submit button
+  document.addEventListener('DOMContentLoaded', () => {
+    const submitBtn = document.getElementById('submitBtn');
     
-    .badge {
-      font-size: 0.75rem;
-      padding: 0.125rem 0.25rem;
-      background-color: var(--color-background);
-      border-radius: var(--radius-sm);
-      color: var(--color-text-light);
-    }
-    
-    .btn svg {
-      margin-left: var(--spacing-xs);
-    }
-    
-    @media (max-width: 768px) {
-      nav ul {
-        gap: 1rem;
-      }
-    }
-    
-    @media (max-width: 640px) {
-      .container {
-        flex-direction: column;
-        gap: 1rem;
-      }
-      
-      nav ul {
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-    }
-  </style>
+    submitBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Call the openSubmitPopup function exposed by the SubmitPopup component
+      window.openSubmitPopup();
+    });
+  });
+</script>

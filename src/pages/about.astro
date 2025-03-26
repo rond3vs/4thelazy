@@ -2,17 +2,299 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import Newsletter from '../components/Newsletter.astro';
 ---
-<MainLayout>
-  <div class="about-content">
-    <h1>About 4thelazy.com</h1>
-    <p>4thelazy.com is a website for lazy people like you and me. We provide tools and tips for those who want to save time and effort.</p>
+<MainLayout title="About Us | 4thelazy.com" description="We're too lazy to write a long description">
+  <div class="container">
+    <div class="about-header">
+      <h1 class="about-title">About <span class="highlight">4thelazy.com</span></h1>
+      <p class="about-subtitle">A website created by lazy people, for lazy people</p>
+    </div>
+    
+    <div class="about-content">
+      <div class="about-section">
+        <h2>Our Origin Story <span class="emoji">🦥</span></h2>
+        <p>4thelazy.com was born one Sunday afternoon when our founder was too lazy to get off the couch to find the TV remote. After twenty minutes of contemplating life's great questions (like "How far can I stretch my arm without actually moving my body?"), they realized there must be a better way.</p>
+        
+        <p>After minimal effort and several procrastination breaks, 4thelazy.com was born—a place where efficiency meets the art of doing as little as possible.</p>
+      </div>
+      
+      <div class="about-section">
+        <h2>Our Mission <span class="emoji">🛌</span></h2>
+        <p>We're on a mission to help you achieve more by doing less. Our team of professional corner-cutters and efficiency enthusiasts works tirelessly (well, as tirelessly as lazy people can) to bring you the best productivity hacks, automation tools, and energy-conservation strategies.</p>
+        
+        <p>Because remember: It's not laziness if you call it "strategic energy allocation."</p>
+      </div>
+      
+      <div class="about-section fun-facts">
+        <h2>Fun Facts About Us <span class="emoji">🎮</span></h2>
+        <ul>
+          <li>Our team meetings are conducted lying down</li>
+          <li>We've automated 94% of our decision-making processes</li>
+          <li>Our office has more recliners than desks</li>
+          <li>We celebrate "Do Nothing Day" every day</li>
+          <li>Our company record for "longest time without moving" is 6 hours (lunch delivery excluded)</li>
+        </ul>
+      </div>
+      
+      <div class="about-section">
+        <h2>The Lazy Code <span class="emoji">🧘‍♂️</span></h2>
+        <ol>
+          <li>If it can be done tomorrow, it will be done tomorrow</li>
+          <li>Always find the path of least resistance</li>
+          <li>Conserve energy like it's a non-renewable resource (it is, for lazy people)</li>
+          <li>Optimize everything to minimize effort</li>
+          <li>Automate ruthlessly, even if it takes more effort now than just doing the task</li>
+        </ol>
+      </div>
+      
+      <div class="about-section team-section">
+        <h2>Meet Our Team</h2>
+        <p>We would introduce you to our team members, but they're currently conserving energy for more important tasks, like deciding what to order for lunch or finding the perfect position on their ergonomic chairs.</p>
+        
+        <div class="lazy-team">
+          <div class="team-member">
+            <div class="avatar">😴</div>
+            <h3>The Founder</h3>
+            <p>Too lazy to write their own bio</p>
+          </div>
+          
+          <div class="team-member">
+            <div class="avatar">🧠</div>
+            <h3>The Thinker</h3>
+            <p>Has great ideas but rarely implements them</p>
+          </div>
+          
+          <div class="team-member">
+            <div class="avatar">🤖</div>
+            <h3>The Automator</h3>
+            <p>Spent 3 weeks automating a 5-minute task</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="about-section">
+        <h2>Contact Us <span class="emoji">📱</span></h2>
+        <p>Want to reach us? Send a message and we'll get back to you when we feel like it (usually 3-5 business days, depending on our energy levels and how interesting your message is).</p>
+        
+        <p>For urgent matters, please reconsider if it's really that urgent. If it still is, send a pizza with your message—food bribes move you to the top of our response queue.</p>
+      </div>
+    </div>
+    
+    <div class="lazy-quote">
+      "Efficiency is just intelligent laziness."
+      <span class="quote-author">— Anonymous (probably too lazy to sign their name)</span>
+    </div>
   </div>
+  
   <Newsletter />
 </MainLayout>
 
 <style>
-    .about-content {
-        
-        
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+  
+  .about-header {
+    text-align: center;
+    margin: var(--spacing-xl) 0;
+  }
+  
+  .about-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: var(--color-primary);
+    line-height: 1.1;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .highlight {
+    font-family: var(--font-heading);
+    position: relative;
+    display: inline-block;
+  }
+  
+  .highlight::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 12px;
+    bottom: 5px;
+    left: 0;
+    background-color: rgba(32, 106, 93, 0.2);
+    z-index: -1;
+    transform: rotate(-2deg);
+  }
+  
+  .about-subtitle {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    color: var(--color-text-light);
+    font-style: italic;
+  }
+  
+  .about-content {
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .about-section {
+    margin-bottom: var(--spacing-xl);
+    background-color: var(--color-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .about-section h2 {
+    font-family: var(--font-primary);
+    color: var(--color-primary);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+  }
+  
+  .emoji {
+    font-size: 1.5em;
+    margin-left: var(--spacing-sm);
+  }
+  
+  .about-section p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .about-section:last-child p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .fun-facts ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .fun-facts li {
+    padding: var(--spacing-sm) 0;
+    padding-left: 2rem;
+    position: relative;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.5;
+  }
+  
+  .fun-facts li::before {
+    content: '🗸';
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-weight: bold;
+  }
+  
+  ol {
+    padding-left: 1.5rem;
+  }
+  
+  ol li {
+    padding: var(--spacing-sm) 0;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.5;
+  }
+  
+  .team-section {
+    text-align: center;
+  }
+  
+  .lazy-team {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+  }
+  
+  .team-member {
+    flex: 1;
+    min-width: 200px;
+    max-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .avatar {
+    font-size: 3rem;
+    width: 100px;
+    height: 100px;
+    background-color: rgba(32, 106, 93, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .team-member h3 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-primary);
+  }
+  
+  .team-member p {
+    font-style: italic;
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--color-text-light);
+  }
+  
+  .lazy-quote {
+    text-align: center;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-style: italic;
+    color: var(--color-primary);
+    margin: var(--spacing-xl) 0;
+    padding: var(--spacing-lg);
+    position: relative;
+  }
+  
+  .lazy-quote::before,
+  .lazy-quote::after {
+    content: '"';
+    font-size: 4rem;
+    position: absolute;
+    opacity: 0.1;
+    color: var(--color-primary);
+  }
+  
+  .lazy-quote::before {
+    top: -20px;
+    left: 0;
+  }
+  
+  .lazy-quote::after {
+    bottom: -40px;
+    right: 0;
+  }
+  
+  .quote-author {
+    display: block;
+    font-size: 1rem;
+    font-style: normal;
+    margin-top: var(--spacing-md);
+    color: var(--color-text-light);
+  }
+  
+  @media (max-width: 768px) {
+    .about-section {
+      padding: var(--spacing-md);
     }
+    
+    .lazy-team {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .team-member {
+      margin-bottom: var(--spacing-lg);
+    }
+  }
 </style>

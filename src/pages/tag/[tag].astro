@@ -3,7 +3,7 @@
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import MainLayout from '../../layouts/MainLayout.astro';
-import BlogResources from '../../components/BlogResources.astro';
+import ItemGrid from '../../components/ItemGrid.astro';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
@@ -34,7 +34,7 @@ const { tag } = Astro.props as Props;
     </div>
   </div>
   
-  <BlogResources tag={tag} />
+  <ItemGrid tag={tag} />
 </MainLayout>
 
 <style>
