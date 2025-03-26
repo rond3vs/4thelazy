@@ -152,7 +152,10 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
       <div class="content-type-tabs">
         <button class="content-type-tab active" data-type="all">All Items ({totalResources})</button>
         <button class="content-type-tab" data-type="blog">Articles ({blogResources})</button>
-        <button class="content-type-tab" data-type="product">Tools ({productResources})</button>
+        <button class="content-type-tab" data-type="product">Products ({productResources})</button>
+        <button class="content-type-tab" data-type="product">Websites ({productResources})</button>
+        <button class="content-type-tab" data-type="product">Apps ({productResources})</button>
+        
         <button class="content-type-tab shuffle-button" data-action="shuffle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
             <path d="M16 3H21V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -238,9 +241,16 @@ isSponsored: false
     max-width: 600px;
     margin: 0 auto var(--spacing-lg);
   }
+  .container {
+  position: relative;
+  padding-top: 3rem;
+}
+
+
 
   .filter-container {
     margin-bottom: var(--spacing-lg);
+    
   }
   
   .search-box {

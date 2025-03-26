@@ -5,6 +5,7 @@ pubDate: 2024-03-20
 image: "/images/products/contract-template.jpg"
 categories: ["Money"]
 isSponsored: false
+type: "Tool"
 ---
 
 ## What's Included
