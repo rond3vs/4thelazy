@@ -5,8 +5,8 @@ export default defineConfig({
   // Enable SSR for dynamic functionality
   output: 'static',
   
-  // Site config
-  site: 'https://lazy-life-hacks.com',
+  site: 'https://rond3vs.github.io',
+  base: '/4thelazy',
   
   // Build settings
   build: {
