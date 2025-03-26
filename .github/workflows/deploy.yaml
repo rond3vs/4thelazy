@@ -2,7 +2,7 @@ name: Deploy Astro Site to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]  # Change this if your primary branch is different
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -26,12 +26,12 @@ jobs:
         run: npm install
 
       - name: Build Astro Site
-        run: npm run build  # Make sure your package.json has "build": "astro build"
+        run: npm run build  # Ensure "build": "astro build" is in package.json
 
       - name: Upload build output
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./dist  # Ensure this matches your Astro build output folder
+          path: ./dist  # Your Astro build output folder
 
   deploy:
     needs: build
