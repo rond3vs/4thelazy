@@ -19,19 +19,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Adjust based on your Astro version (check package.json)
+          node-version: '18'  # Adjust based on your Astro version
 
       - name: Install Dependencies
         run: npm install
 
       - name: Build Astro Site
         run: npm run build
-        
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: astro-build
-          path: dist
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v1
