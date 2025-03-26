@@ -26,8 +26,14 @@ jobs:
 
       - name: Build Astro Site
         run: npm run build
+        
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: astro-build
+          path: dist
 
-      - name: Upload Artifact
+      - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: dist  # Change if your build outputs to a different folder
