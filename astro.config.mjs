@@ -1,15 +1,17 @@
 import { defineConfig } from 'astro/config';
 
-// https://astro.build/config
 export default defineConfig({
-  // Enable SSR for dynamic functionality
   output: 'static',
-  
   site: 'https://rond3vs.github.io',
   base: '/4thelazy',
-  
-  // Build settings
   build: {
-    assets: 'assets'
+    assets: 'assets',
+    // Ensure assets are inlined or properly referenced
+    inlineStylesheets: 'auto', // Optional: Reduces HTTP requests
+  },
+  // Add this if you use markdown files with front matter
+  markdown: {
+    syntaxHighlight: 'shiki',
+    shikiConfig: { theme: 'github-dark' }
   }
 });
