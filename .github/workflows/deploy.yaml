@@ -2,8 +2,7 @@ name: Deploy Astro Site to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches: [main]  # Change to your default branch if different (e.g., 'master')
 
 permissions:
   contents: read
@@ -11,42 +10,27 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: 'npm'
+          node-version: '18'  # Adjust based on your Astro version (check package.json)
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
       - name: Build Astro Site
         run: npm run build
 
-      - name: Create .nojekyll file
-        run: touch ./dist/.nojekyll
-
-      - name: List build output
-        run: ls -la ./dist # Debug: Check contents of dist
-
-      - name: Upload build output
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          path: ./dist
+          path: dist  # Change if your build outputs to a different folder
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v1
