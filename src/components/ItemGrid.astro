@@ -1,39 +1,46 @@
 ---
-// src/components/ResourceGrid.astro
+// src/components/ItemGrid.astro
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import ItemCard from './ItemCard.astro';
 
-// Extended props to support filtering by content type and category
+// Extended props to support more flexible filtering
 interface Props {
   tag?: string;
   limit?: number;
-  contentType?: 'all' | 'blog' | 'product'; // Filter by content type
+  contentType?: string; // Allow any content type as a string
   debug?: boolean; // Enable debug mode
 }
 
-// Define a resource interface to unify both blog posts and products
+// Enhanced resource interface with more flexible categorization
 interface Resource {
-  type: 'blog' | 'product';
+  type: 'blog' | 'product'; // Primary collection type (e.g., 'blog', 'products')
   data: CollectionEntry<'blog'> | CollectionEntry<'products'>;
   slug: string;
-  contentType: string;
+  primaryCategory: string; // Main category (Article, Product, Website, App)
   title: string;
   image: string;
   description: string;
   tags: string[];
   isSponsored: boolean;
   date: Date;
+  displayType?: string; // The type to display in the UI (from frontmatter)
 }
 
 const { tag, limit, contentType = 'all', debug = false } = Astro.props;
 
-// Get all blog posts and products
+// Get all collections
 const allBlogPosts = await getCollection('blog');
 const blogCount = allBlogPosts.length;
 
 const allProducts = await getCollection('products');
 const productCount = allProducts.length;
+
+// For future collections (websites, apps, etc.)
+// const allWebsites = await getCollection('websites');
+// const websiteCount = allWebsites.length;
+// const allApps = await getCollection('apps');
+// const appCount = allApps.length;
 
 // Sort blog posts by publication date (newest first)
 const sortedBlogPosts = allBlogPosts.sort((a, b) => 
@@ -51,46 +58,114 @@ const sortedProducts = allProducts.sort((a, b) => {
 // Combine and prepare all resources
 let allResources: Resource[] = [];
 
-// Add blog posts with a content type identifier
-if (contentType === 'all' || contentType === 'blog') {
-  allResources = [
-    ...allResources,
-    ...sortedBlogPosts.map((post) => ({
+// Improved getPrimaryCategory function
+function getPrimaryCategory(data: any): string {
+  // First, check explicit type field - this has highest priority
+  if ('type' in data) {
+    const typeLC = (data.type || '').toLowerCase();
+    if (typeLC === 'app' || typeLC === 'apps') return 'App';
+    if (typeLC === 'website' || typeLC === 'websites') return 'Website';
+    if (typeLC.includes('article')) return 'Article';
+    if (typeLC.includes('product')) return 'Product';
+  }
+  
+  // Then check tags/categories
+  const tags = data.tags || data.categories || [];
+  for (const tag of tags) {
+    const tagLC = (tag || '').toLowerCase();
+    if (tagLC === 'website') return 'Website';
+    if (tagLC === 'app') return 'App';
+  }
+  
+  // Default fallbacks
+  if (data.productType) return data.productType;
+  if (data.price || data.currency || data.inStock !== undefined) return 'Product';
+  if (data.categories) return 'Product';
+  return 'Article';
+}
+
+// Add blog posts with a more flexible category identification
+allResources = [
+  ...allResources,
+  ...sortedBlogPosts.map((post) => {
+    // Safely determine the display type - handle case where type doesn't exist
+    let displayType = 'Article';
+    
+    // Check if post.data has a type property before accessing it
+    if ('type' in post.data) {
+      displayType = post.data.type;
+    }
+    
+    // Get primary category with enhanced detection
+    let primaryCategory = getPrimaryCategory(post.data);
+    
+    return {
       type: 'blog' as const,
       data: post,
       slug: post.slug,
-      contentType: post.data.type,
+      primaryCategory: primaryCategory,
       title: post.data.title,
       image: post.data.image || '/images/default-blog.png',
       description: post.data.description || '',
       tags: post.data.tags || [],
       isSponsored: post.data.isSponsored || false,
-      date: post.data.pubDate
-    }))
-  ];
-}
+      date: post.data.pubDate,
+      displayType: displayType
+    };
+  })
+];
 
-// Add products with a content type identifier
-if (contentType === 'all' || contentType === 'product') {
-  allResources = [
-    ...allResources,
-    ...sortedProducts.map((product) => ({
+// Add products with more flexible category identification
+allResources = [
+  ...allResources,
+  ...sortedProducts.map((product) => {
+    // Safely determine the display type - handle case where type doesn't exist
+    let displayType = 'Product';
+    
+    // Check if product.data has a type property before accessing it
+    if ('type' in product.data) {
+      displayType = product.data.type as string;
+    } else if (product.data.productType) {
+      // Use productType as fallback if available
+      displayType = product.data.productType as string;
+    }
+    
+    // Get primary category with enhanced detection
+    let primaryCategory = getPrimaryCategory(product.data);
+    
+    return {
       type: 'product' as const,
       data: product,
       slug: product.slug,
-      contentType: 'Product',
+      primaryCategory: primaryCategory,
       title: product.data.title,
       image: product.data.image || '/images/default-product.png',
       description: product.data.description || '',
       tags: product.data.categories || [],
       isSponsored: product.data.isSponsored || false,
-      date: product.data.pubDate || new Date()
-    }))
-  ];
-}
+      date: product.data.pubDate || new Date(),
+      displayType: displayType
+    };
+  })
+];
+
+// Future collections can be added here in a similar pattern
+// (websites, apps, etc.)
 
 // Sort combined resources by date
 let filteredResources = allResources.sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+// Enhanced filtering - allow filtering by main category or custom tag
+if (contentType && contentType !== 'all') {
+  filteredResources = filteredResources.filter(resource => {
+    // Check if it matches primary category (case-insensitive)
+    if (resource.primaryCategory.toLowerCase() === contentType.toLowerCase()) {
+      return true;
+    }
+    // Otherwise check collection type (but be careful with the type comparison)
+    return resource.type === contentType;
+  });
+}
 
 // Filter by tag if specified
 if (tag && tag !== 'all') {
@@ -104,19 +179,23 @@ if (limit) {
   filteredResources = filteredResources.slice(0, limit);
 }
 
-// Get all unique tags/categories from both blogs and products for filtering
-const allBlogTags = [...new Set(allBlogPosts.map((post) => post.data.tags || []).flat())] as string[];
-const allProductCategories = [...new Set(allProducts.map((product) => 
-  product.data.categories || []
-).flat())] as string[];
+// Get all primary categories for the filter
+const allPrimaryCategories = [...new Set(allResources.map(r => r.primaryCategory))].sort();
 
-// Combine all tags and categories for filtering
-const allTags = [...new Set([...allBlogTags, ...allProductCategories])].sort();
+// Get all unique tags from all resources
+const allTags = [...new Set(allResources.flatMap(r => r.tags))].sort();
 
-// Calculate counts for debugging
+// Calculate counts for each primary category - case insensitive matching
+const categoryCounts = {
+  all: allResources.length,
+  Article: allResources.filter(r => r.primaryCategory.toLowerCase() === 'article').length,
+  Product: allResources.filter(r => r.primaryCategory.toLowerCase() === 'product').length,
+  Website: allResources.filter(r => r.primaryCategory.toLowerCase() === 'website').length,
+  App: allResources.filter(r => r.primaryCategory.toLowerCase() === 'app').length,
+};
+
+// Calculate debug information
 const totalResources = filteredResources.length;
-const blogResources = filteredResources.filter(r => r.type === 'blog').length;
-const productResources = filteredResources.filter(r => r.type === 'product').length;
 ---
 
 <section class="resources-section">
@@ -131,8 +210,10 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
           <li>Blog collection: {blogCount} items</li>
           <li>Product collection: {productCount} items</li>
           <li>Total resources loaded: {totalResources}</li>
-          <li>Blog resources: {blogResources}</li>
-          <li>Product resources: {productResources}</li>
+          <li>Articles: {categoryCounts.Article}</li>
+          <li>Products: {categoryCounts.Product}</li>
+          <li>Websites: {categoryCounts.Website}</li>
+          <li>Apps: {categoryCounts.App}</li>
           <li>Current filter: {contentType}</li>
           <li>Tag filter: {tag || 'none'}</li>
         </ul>
@@ -148,13 +229,13 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
         <input type="text" id="resource-search" placeholder="Search..." />
       </div>
       
-      <!-- Content type filter -->
+      <!-- Content type filter - using primary categories -->
       <div class="content-type-tabs">
-        <button class="content-type-tab active" data-type="all">All Items ({totalResources})</button>
-        <button class="content-type-tab" data-type="blog">Articles ({blogResources})</button>
-        <button class="content-type-tab" data-type="product">Products ({productResources})</button>
-        <button class="content-type-tab" data-type="product">Websites ({productResources})</button>
-        <button class="content-type-tab" data-type="product">Apps ({productResources})</button>
+        <button class="content-type-tab active" data-type="all">All Items ({categoryCounts.all})</button>
+        <button class="content-type-tab" data-type="article">Articles ({categoryCounts.Article})</button>
+        <button class="content-type-tab" data-type="product">Products ({categoryCounts.Product})</button>
+        <button class="content-type-tab" data-type="website">Websites ({categoryCounts.Website})</button>
+        <button class="content-type-tab" data-type="app">Apps ({categoryCounts.App})</button>
         
         <button class="content-type-tab shuffle-button" data-action="shuffle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
@@ -168,7 +249,7 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
         </button>
       </div>
       
-      <!-- Tags filter - NEW SECTION -->
+      <!-- Tags filter - enhanced with custom categories -->
       <div class="tags-filter">
         <h3 class="filter-title">Filter by tags</h3>
         <div class="filter-tabs" id="tag-filters">
@@ -189,7 +270,7 @@ const productResources = filteredResources.filter(r => r.type === 'product').len
             link={`/${resource.type}/${resource.slug}`}
             description={resource.description}
             tags={resource.tags}
-            type={resource.contentType}
+            type={resource.displayType || resource.primaryCategory}
             isSponsored={resource.isSponsored}
             contentType={resource.type}
           />
@@ -216,13 +297,13 @@ title: "Product Title"
 description: "Product description"
 pubDate: 2024-03-22
 image: "/images/products/example.jpg"
+type: "Product" # This determines the primary category
 categories: ["Category1", "Category2"]
 isSponsored: false
 ---</code></pre>
       </div>
     )}
-    
-   
+  </div>
 </section>
 
 <style>
@@ -245,8 +326,6 @@ isSponsored: false
   position: relative;
   padding-top: 3rem;
 }
-
-
 
   .filter-container {
     margin-bottom: var(--spacing-lg);
@@ -306,7 +385,7 @@ isSponsored: false
     color: var(--color-primary);
   }
 
-  /* Tags Filter - NEW STYLES */
+  /* Tags Filter styles */
   .tags-filter {
     margin-top: var(--spacing-md);
   }
@@ -414,7 +493,7 @@ isSponsored: false
     }
   }
   
-  /* Add these new styles for the shuffle button and animations */
+  /* Styles for the shuffle button and animations */
   .shuffle-button {
     display: flex;
     align-items: center;
@@ -468,7 +547,6 @@ isSponsored: false
   const visibleCountEl = document.getElementById('visible-count');
   const filterDebug = document.getElementById('filter-debug');
   
-  // Enable debug display temporarily
   if (filterDebug) {
     filterDebug.style.display = 'block';
   }
@@ -477,17 +555,44 @@ isSponsored: false
   let activeTag = 'all';
   let isShuffled = false;
   
-  // Debug log all available tags
+  // Debug log all available resource cards
   console.log("=== RESOURCE FILTERING DEBUG ===");
   console.log(`Found ${resourceCards.length} resource cards total`);
   
+  // Process all resource cards to normalize their primary categories
   resourceCards.forEach(card => {
     const title = card.querySelector('h3')?.textContent || 'Unknown';
     const contentType = card.getAttribute('data-content-type');
-    const tagElements = card.querySelectorAll('.tags span');
-    const tags = Array.from(tagElements).map(tag => tag.textContent.trim());
     
-    console.log(`Card: "${title}", Type: ${contentType}, Tags: [${tags.join(', ')}]`);
+    // Get primary category and normalize it
+    let primaryCategory = card.getAttribute('data-primary-category') || '';
+    primaryCategory = primaryCategory.toLowerCase();
+    
+    // Normalize plural forms to singular
+    if (primaryCategory === 'apps') {
+      primaryCategory = 'app';
+      card.setAttribute('data-primary-category', 'app');
+    } else if (primaryCategory === 'websites') {
+      primaryCategory = 'website';
+      card.setAttribute('data-primary-category', 'website');
+    }
+    
+    // Check tags for additional categorization
+    const tagElements = card.querySelectorAll('.tag');
+    const tags = Array.from(tagElements).map(tag => tag.textContent.trim().toLowerCase());
+    
+    // If tags indicate website or app and primary category doesn't, update it
+    if (primaryCategory !== 'website' && primaryCategory !== 'app') {
+      if (tags.includes('website')) {
+        primaryCategory = 'website';
+        card.setAttribute('data-primary-category', 'website');
+      } else if (tags.includes('app')) {
+        primaryCategory = 'app';
+        card.setAttribute('data-primary-category', 'app');
+      }
+    }
+    
+    console.log(`Card: "${title}", Type: ${contentType}, Primary Category: ${primaryCategory}, Tags: [${tags.join(', ')}]`);
   });
   
   // Filter by content type
@@ -576,7 +681,7 @@ isSponsored: false
     }, 10);
   }
   
-  // Combined filtering function
+  // Enhanced filtering function to work with your ResourceItem component
   function filterResources() {
     const searchTerm = searchInput.value.toLowerCase();
     let visibleCount = 0;
@@ -587,24 +692,25 @@ isSponsored: false
     console.log(`Search term: ${searchTerm}`);
     
     resourceCards.forEach(card => {
-      // Get the card's content type
+      // Get card data for filtering
       const cardContentType = card.getAttribute('data-content-type');
-      
-      // Get the card's title for debugging
-      const title = card.querySelector('h3')?.textContent || 'Unknown';
-      
-      // Get tags from the card - using our specific markup
-      const tagElements = card.querySelectorAll('.tags span');
+      const cardPrimaryCategory = (card.getAttribute('data-primary-category') || '').toLowerCase();
+      const title = card.querySelector('h3')?.textContent || '';
+      const tagElements = card.querySelectorAll('.tag');
       const tags = Array.from(tagElements).map(tag => tag.textContent.trim().toLowerCase());
-      
-      // Debug this card
-      console.log(`Checking card: "${title}", Type: ${cardContentType}, Tags: [${tags.join(', ')}]`);
-      
-      // For search, get title and description
       const description = card.querySelector('p')?.textContent.toLowerCase() || '';
       
-      // Check content type match
-      const contentTypeMatch = activeContentType === 'all' || activeContentType === cardContentType;
+      // Debug this card
+      console.log(`Checking card: "${title}", Type: ${cardContentType}, Primary Category: ${cardPrimaryCategory}, Tags: [${tags.join(', ')}]`);
+      
+      // Enhanced content type matching - check both primary category and content type
+      let contentTypeMatch = false;
+      if (activeContentType === 'all') {
+        contentTypeMatch = true;
+      } else {
+        // Match against primary category (case-insensitive)
+        contentTypeMatch = (cardPrimaryCategory === activeContentType.toLowerCase());
+      }
       
       // Check tag match
       const tagMatch = activeTag === 'all' || tags.includes(activeTag.toLowerCase());

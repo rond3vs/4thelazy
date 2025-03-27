@@ -1,50 +1,88 @@
 ---
-// src/components/ResourceItem.astro
+// src/components/ItemCard.astro
 interface Props {
   title: string;
   link: string;
   description: string;
   tags: string[];
-  type: string;
+  type: string; // This receives the displayType from ResourceGrid
   isSponsored?: boolean;
   contentType: 'blog' | 'product';
 }
 
 const { title, link, description, tags, type, isSponsored = false, contentType } = Astro.props;
+
+// Determine the primary label (what shows on the left)
+let primaryLabel = contentType === 'blog' ? 'Article' : 'Product';
+
+// Determine the content type label (what shows on the right)
+let contentTypeLabel = type;
+
+// Set the primary category for filtering based on type field
+// Convert to lowercase for comparison and normalize "Apps" to "app"
+let primaryCategory = type.toLowerCase();
+if (primaryCategory === 'apps') {
+  primaryCategory = 'app';
+} else if (primaryCategory === 'websites') {
+  primaryCategory = 'website';
+}
+
+// Check tags for Website or App if not already set
+if (primaryCategory !== 'app' && primaryCategory !== 'website') {
+  if (tags) {
+    for (const tag of tags) {
+      const tagLC = tag.toLowerCase();
+      if (tagLC === 'website') {
+        primaryCategory = 'website';
+        break;
+      } else if (tagLC === 'app') {
+        primaryCategory = 'app';
+        break;
+      }
+    }
+  }
+}
 ---
 
-<div class="card resource-card" data-content-type={contentType}>
+<div class="card resource-card" data-content-type={contentType} data-primary-category={primaryCategory}>
   <a href={link}>
     <div class="content">
       <div class="meta">
-        <span class="type">{type}</span>
-        <span class="content-type">{contentType === 'blog' ? 'Article' : 'Tool'}</span>
+        <span class="type">{primaryLabel}</span>
+        <span class="content-type">{contentTypeLabel}</span>
         {isSponsored && <span class="sponsored">Sponsored</span>}
       </div>
       
-      <h3>{title}</h3>
+      <h3 class="card-title">{title}</h3>
       
-      {description && <p>{description}</p>}
+      <div class="card-body">
+        {description && <p>{description}</p>}
+      </div>
       
-      {tags?.length > 0 && (
-        <div class="tags">
-          {tags.map((tag) => (
-            <span class="tag" data-tag={tag}>{tag}</span>
-          ))}
-        </div>
-      )}
+      <div class="card-footer">
+        {tags?.length > 0 && (
+          <div class="tags">
+            {tags.map((tag) => (
+              <span class="tag" data-tag={tag}>{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   </a>
 </div>
 
 <style>
-  
   .card {
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
-    border: 2px solid #333333;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
   
   .card:hover {
@@ -53,79 +91,93 @@ const { title, link, description, tags, type, isSponsored = false, contentType }
   }
   
   a {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     color: inherit;
     text-decoration: none;
   }
   
+  a:hover {
+    text-decoration: none;
+  }
+  
   .content {
-    padding: 1rem;
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
   }
   
   .meta {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
     font-size: 0.8rem;
   }
   
   .type {
     padding: 0.1rem 0.4rem;
-    
-    border-radius: 0.25rem;
+    border-radius: var(--radius-sm);
     font-weight: 600;
+    background-color: var(--color-primary-light);
+    color: var(--color-white);
   }
   
   .content-type {
     font-weight: 600;
-    color: #4361ee;
+    color: var(--color-primary);
   }
   
   .sponsored {
     margin-left: auto;
     padding: 0.1rem 0.4rem;
     background: rgba(0, 0, 0, 0.6);
-    color: white;
-    border-radius: 0.25rem;
+    color: var(--color-white);
+    border-radius: var(--radius-sm);
     font-size: 0.7rem;
   }
   
-  h3 {
-    margin: 0 0 0.5rem;
-    font-size: 1.35rem;
+  .card-title {
+    margin: 0 0 var(--spacing-sm);
+    font-size: var(--font-size-lg);
     line-height: 1.4;
+    color: var(--color-primary-dark);
+  }
+  
+  .card-body {
+    flex-grow: 1;
   }
   
   p {
-    margin: 0 0 0.75rem;
-    font-size: 1.2rem;
-    color: #6c757d;
+    margin: 0 0 var(--spacing-md);
+    font-size: 1rem;
+    color: var(--color-text);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   
+  .card-footer {
+    margin-top: auto;
+    padding-top: var(--spacing-sm);
+  }
+  
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem;
+    gap: var(--spacing-xs);
     font-size: 0.75rem;
-    color: #6c757d;
   }
   
-  /* Remove the bullet separator and make each tag distinct */
   .tags span {
     padding: 0.15rem 0.35rem;
-    background: rgba(67, 97, 238, 0.1);
-    border-radius: 0.25rem;
-    margin-right: 0.25rem;
-  }
-  
-  /* Remove the bullet after each tag */
-  .tags span:not(:last-child):after {
-    content: "";
-    margin-left: 0;
+    background: rgba(32, 106, 93, 0.1);
+    border-radius: var(--radius-full);
+    color: var(--color-primary);
+    margin-right: var(--spacing-xs);
   }
 </style>
