@@ -1,0 +1,167 @@
+---
+// src/pages/thank-you.astro
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Thank You - Freelance Things">
+  <main class="thank-you-container">
+    <div class="thank-you-content">
+      <h1>Thank You!</h1>
+      <div class="icon-container">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 11.0857V12.0057C21.9988 14.1621 21.3005 16.2604 20.0093 17.9875C18.7182 19.7147 16.9033 20.9782 14.8354 21.5896C12.7674 22.201 10.5573 22.1276 8.53447 21.3803C6.51168 20.633 4.78465 19.2518 3.61096 17.4428C2.43727 15.6338 1.87979 13.4938 2.02168 11.342C2.16356 9.19029 2.99721 7.14205 4.39828 5.5028C5.79935 3.86354 7.69279 2.72111 9.79619 2.24587C11.8996 1.77063 14.1003 1.98806 16.07 2.86572" stroke="#206A5D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 4L12 14.01L9 11.01" stroke="#206A5D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Resource submitted successfully!</h2>
+      <p>Thanks for submitting a resource to Freelance Things. We appreciate your contribution to the community.</p>
+      
+      <div class="feedback-message">
+        <p>We'll review your submission shortly. If selected, it will be featured on our platform for other freelancers to discover.</p>
+      </div>
+      
+      <div class="next-actions">
+        <a href="/" class="btn btn-primary">Back to Homepage</a>
+        <a href="#" class="btn" id="submitAnother">Submit Another Resource</a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .thank-you-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: var(--spacing-lg);
+  }
+
+  .thank-you-content {
+    background-color: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    margin-bottom: var(--spacing-md);
+  }
+
+  h2 {
+    color: var(--color-primary);
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 4vw, 1.7rem);
+    margin-bottom: var(--spacing-md);
+  }
+
+  p {
+    font-family: var(--font-primary);
+    font-size: clamp(1rem, 1.2vw, 1.2rem);
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .icon-container {
+    display: flex;
+    justify-content: center;
+    margin: var(--spacing-lg) 0;
+  }
+
+  .icon-container svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .feedback-message {
+    background-color: rgba(32, 106, 93, 0.1);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
+  }
+
+  .feedback-message p {
+    margin-bottom: 0;
+  }
+
+  .next-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    text-decoration: none;
+  }
+
+  .btn:not(.btn-primary) {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .btn:not(.btn-primary):hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .thank-you-content {
+      padding: var(--spacing-lg);
+    }
+
+    .next-actions {
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const submitAnotherBtn = document.getElementById('submitAnother');
+    
+    submitAnotherBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Check if openSubmitPopup function exists (defined in SubmitPopup.astro)
+      if (typeof window.openSubmitPopup === 'function') {
+        window.openSubmitPopup();
+      } else {
+        // Fallback if function is not available, navigate to homepage
+        window.location.href = '/';
+      }
+    });
+  });
+</script>
