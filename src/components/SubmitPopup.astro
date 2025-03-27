@@ -15,7 +15,10 @@
     <p class="popup-description">
       Submit a resource for other freelancers. If we like it too, we'll feature it on Freelance Things.
     </p>
-    <form id="submitForm" class="popup-form" action="https://formsubmit.co/4tl@4thelazy.com" method="POST">
+    <form id="submitForm" class="popup-form" action="https://api.web3forms.com/submit" method="POST">
+      <!-- Replace with your Web3Forms access key -->
+      <input type="hidden" name="access_key" value="29b7fb03-a629-41f1-929d-e307fac55934">
+      
       <div class="form-field">
         <input type="url" id="resourceLink" name="Resource Link" placeholder="Resource link" required>
       </div>
@@ -27,12 +30,11 @@
         <label for="subscribeCheckbox">Subscribe to the weekly email</label>
       </div>
       
-      <!-- FormSubmit configuration fields -->
-      <input type="hidden" name="_subject" value="New Resource Submission for Freelance Things">
-      <input type="hidden" name="_captcha" value="false">
-      
-      <!-- Important: Use the full absolute URL for the thank you page -->
-      <input type="hidden" name="_next" value="https://rond3vs.github.io/thank-you">
+      <!-- Web3Forms configuration -->
+      <input type="hidden" name="subject" value="New Resource Submission for Freelance Things">
+      <input type="hidden" name="redirect" value="https://rond3vs.github.io/thank-you">
+      <input type="hidden" name="from_name" value="Freelance Things Resource Submission">
+      <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
       
       <button type="submit" class="submit-btn">
         Submit
@@ -165,6 +167,10 @@
     stroke: currentColor;
   }
 
+  .hidden {
+    display: none;
+  }
+
   @media (max-width: 768px) {
     .popup-content {
       padding: var(--spacing-md, 1rem);
@@ -228,8 +234,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       
-      // Now submit the form to FormSubmit
-      submitForm.submit();
+      // Now submit the form to Web3Forms
+      const formData = new FormData(submitForm);
+      
+      const response = await fetch(submitForm.action, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Redirect to thank you page
+        window.location.href = 'https://rond3vs.github.io/thank-you';
+      } else {
+        throw new Error('Form submission failed');
+      }
       
     } catch (error) {
       console.error('Submission error:', error);
