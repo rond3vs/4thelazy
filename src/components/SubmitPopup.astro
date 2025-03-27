@@ -15,17 +15,23 @@
       <p class="popup-description">
         Submit a resource for other freelancers. If we like it too, we'll feature it on Freelance Things.
       </p>
-      <form id="submitForm" class="popup-form">
+      <form id="submitForm" class="popup-form" action="https://formsubmit.co/4tl@4thelazy.com" method="POST">
         <div class="form-field">
-          <input type="url" id="resourceLink" placeholder="Resource link" required>
+          <input type="url" id="resourceLink" name="Resource Link" placeholder="Resource link" required>
         </div>
         <div class="form-field">
-          <input type="email" id="emailAddress" placeholder="Your email address" required>
+          <input type="email" id="emailAddress" name="Email Address" placeholder="Your email address" required>
         </div>
         <div class="form-field checkbox-field">
-          <input type="checkbox" id="subscribeCheckbox">
+          <input type="checkbox" id="subscribeCheckbox" name="Subscribe to Newsletter" value="Yes">
           <label for="subscribeCheckbox">Subscribe to the weekly email</label>
         </div>
+        
+        <!-- FormSubmit configuration fields -->
+        <input type="hidden" name="_subject" value="New Resource Submission for Freelance Things">
+        <input type="hidden" name="_captcha" value="false"> <!-- Optional: Disable captcha -->
+        <input type="hidden" name="_next" value="https://yourdomain.com/thank-you"> <!-- Optional: Redirect after submission -->
+        
         <button type="submit" class="submit-btn">
           Submit
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -165,49 +171,42 @@
   </style>
   
   <script is:inline>
-    // The popup component script
     document.addEventListener('DOMContentLoaded', () => {
-      const closePopup = document.getElementById('closePopup');
-      const submitPopup = document.getElementById('submitPopup');
-      const submitForm = document.getElementById('submitForm');
-  
-      // Close popup when close button is clicked
-      closePopup.addEventListener('click', () => {
-        submitPopup.classList.remove('active');
-        document.body.style.overflow = '';
-      });
-  
-      // Close popup when clicking outside content area
-      submitPopup.addEventListener('click', (e) => {
-        if (e.target === submitPopup) {
-          submitPopup.classList.remove('active');
-          document.body.style.overflow = '';
-        }
-      });
-  
-      // Form submission logic
-      submitForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const resourceLink = document.getElementById('resourceLink').value;
-        const emailAddress = document.getElementById('emailAddress').value;
-        const subscribeCheckbox = document.getElementById('subscribeCheckbox').checked;
-        
-        // Handle form submission - you can replace this with your actual submission logic
-        console.log('Form submitted:', { resourceLink, emailAddress, subscribeToNewsletter: subscribeCheckbox });
-        
-        // Optional: Show success message or reset form
-        alert('Resource submitted successfully!');
-        submitForm.reset();
-        submitPopup.classList.remove('active');
-        document.body.style.overflow = '';
-      });
-    });
-  
-    // Expose a function to open the popup that can be called from other components
-    window.openSubmitPopup = function() {
-      const submitPopup = document.getElementById('submitPopup');
-      submitPopup.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    };
+  const closePopup = document.getElementById('closePopup');
+  const submitPopup = document.getElementById('submitPopup');
+  const submitForm = document.getElementById('submitForm');
+
+  // Close popup when close button is clicked
+  closePopup.addEventListener('click', () => {
+    submitPopup.classList.remove('active');
+    document.body.style.overflow = '';
+  });
+
+  // Close popup when clicking outside content area
+  submitPopup.addEventListener('click', (e) => {
+    if (e.target === submitPopup) {
+      submitPopup.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // For FormSubmit, we still want to handle visual feedback before submission
+  submitForm.addEventListener('submit', (e) => {
+    // Don't prevent default - let the form submit normally to FormSubmit
+    
+    // Optional: Show loading state
+    const submitBtn = submitForm.querySelector('.submit-btn');
+    submitBtn.innerHTML = 'Submitting...';
+    submitBtn.disabled = true;
+    
+    // FormSubmit will handle the actual submission and redirect
+  });
+});
+
+// Expose a function to open the popup that can be called from other components
+window.openSubmitPopup = function() {
+  const submitPopup = document.getElementById('submitPopup');
+  submitPopup.classList.add('active');
+  document.body.style.overflow = 'hidden';
+};
   </script>

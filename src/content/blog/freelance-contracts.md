@@ -1,33 +1,56 @@
 ---
-title: "Freelance Contracts for the Chronically Lazy: Dos and Don'ts"
-description: "A laid-back guide to protecting your work without lifting too many fingers."
-pubDate: 2025-03-01
-tags: ["Laziness", "Freelance", "Contracts", "Chill"]
+title: "Digital Minimalism: How I Reclaimed 3 Hours Per Day By Deleting Almost Everything"
+description: "The counterintuitive path to digital productivity isn't more apps—it's fewer."
+pubDate: 2025-03-15
+image: "/images/blog/digital-minimalism.jpg"
+tags: ["Productivity", "Money", "Chill", "Laziness"]
 type: "Article"
 ---
 
-## The Dos (For When You *Barely* Want to Do Anything)
+Six months ago, my digital life was a chaotic mess. 147 desktop icons. 230+ browser bookmarks. 17 productivity apps. Countless notifications interrupting my day. I was drowning in digital clutter while ironically downloading more apps promising to help me stay organized.
 
-1. **Do use a template:**  
-   Why reinvent the wheel when you can copy-paste someone else's hard work? Grab a solid contract template, make the minimal tweaks, and call it a day—your couch awaits.
+Then I discovered digital minimalism and deleted almost everything. Here's what happened.
 
-2. **Do specify payment terms:**  
-   Clearly state when and how you'll get paid. That way, you won't have to drag yourself off the sofa to chase down payments later. Money in, nap time guaranteed!
+## The Great Digital Purge
 
-3. **Do include a kill fee:**  
-   If the client decides to bail mid-project (or you hit snooze on the job), make sure you're still compensated. Even if you're lazy, you deserve a little extra for not doing much.
+### What I Deleted:
+- 16 of my 17 productivity apps
+- 90% of my desktop shortcuts
+- 200+ bookmarks I never used
+- 80% of my social media accounts
+- All notifications except calls and messages from real humans
+- 15,000+ emails (yes, really)
 
-## The Don'ts (Because Even Lazy Folks Have Standards)
+## The Results Were Immediate
 
-1. **Don't skip written agreements:**  
-   Sure, verbal promises might be easier, but they can lead to headaches down the road. Get it in writing—even if it means a tiny bit of extra effort now, you'll save yourself from a marathon email chain later.
+### 1. My focus returned
+Within days, I could concentrate for 90+ minute stretches without the phantom urge to check notifications. My brain literally felt different—clearer and calmer.
 
-2. **Don't forget to specify deliverables:**  
-   Spell out exactly what you’re providing. That way, if you do end up working on something, everyone’s on the same page without you having to explain yourself repeatedly.
+### 2. I saved shocking amounts of time
+Between app-hopping, notification-checking, and endlessly organizing my digital "stuff," I was wasting nearly 3 hours daily. Those hours are now mine again.
 
-3. **Don't ignore copyright terms:**  
-   Sort out who owns the work when it’s done. It’s the lazy person’s secret to avoiding extra follow-up discussions and potential disputes.
+### 3. Decision fatigue vanished
+No more debating which note-taking app to use or which task manager was "optimal." With fewer options, I made decisions faster and with more confidence.
 
----
+## The Minimalist Digital Setup That Actually Works
 
-Even if your motto is “work smarter, not harder,” a good contract is your ticket to peace of mind. Take a few moments now, and you'll have fewer headaches—and more time for that well-deserved nap!
+### The Core System:
+- **One note-taking app** (plain text only)
+- **One calendar** (ruthlessly guarded)
+- **One task manager** (the simpler the better)
+- **One cloud storage solution**
+- **Two-folder email system** (inbox and archive—that's it)
+
+### The Rules:
+1. **If it doesn't bring immediate value, delete it**
+2. **Create nothing that requires ongoing maintenance**
+3. **No notifications except from actual humans**
+4. **Digital cleanup every Friday (15 minutes max)**
+
+## What I Learned
+
+Digital minimalism isn't about suffering or technological regression. It's about intentionality. Every app, notification, and digital service demands a piece of your attention—and attention is the most valuable currency we have.
+
+By eliminating digital excess, I didn't just declutter my devices—I decluttered my mind. And in that newfound mental space, I rediscovered something I hadn't experienced in years: the ability to think deeply and create freely, without the constant digital hum of distraction.
+
+What could you delete today?
