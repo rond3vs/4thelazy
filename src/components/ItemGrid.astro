@@ -10,46 +10,98 @@ interface Props {
   limit?: number;
   contentType?: string; // Allow any content type as a string
   debug?: boolean; // Enable debug mode
+  includeAllDates?: boolean; // Option to include all dates or not
 }
 
-// Enhanced resource interface with more flexible categorization
+// Enhanced resource interface to support all collection types
 interface Resource {
-  type: 'blog' | 'product'; // Primary collection type (e.g., 'blog', 'products')
-  data: CollectionEntry<'blog'> | CollectionEntry<'products'>;
+  type: 'blog' | 'product' | 'app' | 'website'; // All supported collection types
+  data: CollectionEntry<'blog'> | CollectionEntry<'products'> | CollectionEntry<'apps'> | CollectionEntry<'websites'>;
   slug: string;
-  primaryCategory: string; // Main category (Article, Product, Website, App)
   title: string;
-  image: string;
   description: string;
-  tags: string[];
+  image: string;
+  pubDate: Date;
+  updatedDate?: Date;
   isSponsored: boolean;
-  date: Date;
-  displayType?: string; // The type to display in the UI (from frontmatter)
+  
+  // Collection-specific fields
+  tags?: string[];            // For blog
+  categories?: string[];      // For products, apps, websites
+  price?: number;             // For products, apps
+  currency?: string;          // For products, apps, websites
+  rating?: number;            // For products, apps, websites
+  affiliateLink?: string;     // For products
+  
+  // App-specific fields
+  platform?: string[];
+  developer?: string;
+  version?: string;
+  isFreemium?: boolean;
+  hasSubscription?: boolean;
+  downloadLink?: string;
+  
+  // Website-specific fields
+  url?: string;
+  technologies?: string[];
+  services?: string[];
+  hasFreeTier?: boolean;
+  hasPaidPlan?: boolean;
+  monthlyPrice?: number;
 }
 
-const { tag, limit, contentType = 'all', debug = false } = Astro.props;
+const { 
+  tag, 
+  limit, 
+  contentType = 'all', 
+  debug = false,
+  includeAllDates = true
+} = Astro.props;
 
 // Get all collections
 const allBlogPosts = await getCollection('blog');
-const blogCount = allBlogPosts.length;
-
 const allProducts = await getCollection('products');
+const allApps = await getCollection('apps');
+const allWebsites = await getCollection('websites');
+
+// Collection counts for debugging
+const blogCount = allBlogPosts.length;
 const productCount = allProducts.length;
+const appCount = allApps.length;
+const websiteCount = allWebsites.length;
 
-// For future collections (websites, apps, etc.)
-// const allWebsites = await getCollection('websites');
-// const websiteCount = allWebsites.length;
-// const allApps = await getCollection('apps');
-// const appCount = allApps.length;
+// Debug log
+if (debug) {
+  console.log("=== DEBUG: COLLECTION COUNTS ===");
+  console.log(`Blog posts: ${blogCount}`);
+  console.log(`Products: ${productCount}`);
+  console.log(`Apps: ${appCount}`);
+  console.log(`Websites: ${websiteCount}`);
+  
+  console.log("=== DEBUG: ALL BLOG POSTS ===");
+  allBlogPosts.forEach(post => {
+    console.log(`Post: ${post.slug}, Date: ${post.data.pubDate}, Tags: [${post.data.tags?.join(', ') || 'none'}]`);
+  });
+}
 
-// Sort blog posts by publication date (newest first)
+// Sort collections by publication date (newest first)
 const sortedBlogPosts = allBlogPosts.sort((a, b) => 
   b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-// Sort products by publication date (newest first)
 const sortedProducts = allProducts.sort((a, b) => {
-  // Use pubDate if available, otherwise use current date
+  const dateA = a.data.pubDate || new Date();
+  const dateB = b.data.pubDate || new Date();
+  return dateB.valueOf() - dateA.valueOf();
+});
+
+const sortedApps = allApps.sort((a, b) => {
+  const dateA = a.data.pubDate || new Date();
+  const dateB = b.data.pubDate || new Date();
+  return dateB.valueOf() - dateA.valueOf();
+});
+
+const sortedWebsites = allWebsites.sort((a, b) => {
   const dateA = a.data.pubDate || new Date();
   const dateB = b.data.pubDate || new Date();
   return dateB.valueOf() - dateA.valueOf();
@@ -58,140 +110,142 @@ const sortedProducts = allProducts.sort((a, b) => {
 // Combine and prepare all resources
 let allResources: Resource[] = [];
 
-// Improved getPrimaryCategory function
-function getPrimaryCategory(data: any): string {
-  // First, check explicit type field - this has highest priority
-  if ('type' in data) {
-    const typeLC = (data.type || '').toLowerCase();
-    if (typeLC === 'app' || typeLC === 'apps') return 'App';
-    if (typeLC === 'website' || typeLC === 'websites') return 'Website';
-    if (typeLC.includes('article')) return 'Article';
-    if (typeLC.includes('product')) return 'Product';
-  }
-  
-  // Then check tags/categories
-  const tags = data.tags || data.categories || [];
-  for (const tag of tags) {
-    const tagLC = (tag || '').toLowerCase();
-    if (tagLC === 'website') return 'Website';
-    if (tagLC === 'app') return 'App';
-  }
-  
-  // Default fallbacks
-  if (data.productType) return data.productType;
-  if (data.price || data.currency || data.inStock !== undefined) return 'Product';
-  if (data.categories) return 'Product';
-  return 'Article';
-}
-
-// Add blog posts with a more flexible category identification
+// Map blog posts to resources
 allResources = [
   ...allResources,
-  ...sortedBlogPosts.map((post) => {
-    // Safely determine the display type - handle case where type doesn't exist
-    let displayType = 'Article';
-    
-    // Check if post.data has a type property before accessing it
-    if ('type' in post.data) {
-      displayType = post.data.type;
-    }
-    
-    // Get primary category with enhanced detection
-    let primaryCategory = getPrimaryCategory(post.data);
-    
-    return {
-      type: 'blog' as const,
-      data: post,
-      slug: post.slug,
-      primaryCategory: primaryCategory,
-      title: post.data.title,
-      image: post.data.image || '/images/default-blog.png',
-      description: post.data.description || '',
-      tags: post.data.tags || [],
-      isSponsored: post.data.isSponsored || false,
-      date: post.data.pubDate,
-      displayType: displayType
-    };
-  })
+  ...sortedBlogPosts.map((post) => ({
+    type: 'blog' as const,
+    data: post,
+    slug: post.slug,
+    title: post.data.title,
+    description: post.data.description || '',
+    image: post.data.image || '/images/default-blog.png',
+    pubDate: post.data.pubDate,
+    updatedDate: post.data.updatedDate,
+    isSponsored: post.data.isSponsored || false,
+    tags: post.data.tags || []
+  }))
 ];
 
-// Add products with more flexible category identification
+// Map products to resources
 allResources = [
   ...allResources,
-  ...sortedProducts.map((product) => {
-    // Safely determine the display type - handle case where type doesn't exist
-    let displayType = 'Product';
-    
-    // Check if product.data has a type property before accessing it
-    if ('type' in product.data) {
-      displayType = product.data.type as string;
-    } else if (product.data.productType) {
-      // Use productType as fallback if available
-      displayType = product.data.productType as string;
-    }
-    
-    // Get primary category with enhanced detection
-    let primaryCategory = getPrimaryCategory(product.data);
-    
-    return {
-      type: 'product' as const,
-      data: product,
-      slug: product.slug,
-      primaryCategory: primaryCategory,
-      title: product.data.title,
-      image: product.data.image || '/images/default-product.png',
-      description: product.data.description || '',
-      tags: product.data.categories || [],
-      isSponsored: product.data.isSponsored || false,
-      date: product.data.pubDate || new Date(),
-      displayType: displayType
-    };
-  })
+  ...sortedProducts.map((product) => ({
+    type: 'product' as const,
+    data: product,
+    slug: product.slug,
+    title: product.data.title,
+    description: product.data.description || '',
+    image: product.data.image || '/images/default-product.png',
+    pubDate: product.data.pubDate || new Date(),
+    updatedDate: product.data.updatedDate,
+    isSponsored: product.data.isSponsored || false,
+    categories: product.data.categories || [],
+    price: product.data.price || 0,
+    currency: product.data.currency || 'USD',
+    rating: product.data.rating || 0,
+    affiliateLink: product.data.affiliateLink || ''
+  }))
 ];
 
-// Future collections can be added here in a similar pattern
-// (websites, apps, etc.)
+// Map apps to resources
+allResources = [
+  ...allResources,
+  ...sortedApps.map((app) => ({
+    type: 'app' as const,
+    data: app,
+    slug: app.slug,
+    title: app.data.title,
+    description: app.data.description || '',
+    image: app.data.image || '/images/default-app.png',
+    pubDate: app.data.pubDate || new Date(),
+    updatedDate: app.data.updatedDate,
+    isSponsored: app.data.isSponsored || false,
+    categories: app.data.categories || [],
+    platform: app.data.platform || [],
+    price: app.data.price || 0,
+    currency: app.data.currency || 'USD',
+    isFreemium: app.data.isFreemium || false,
+    hasSubscription: app.data.hasSubscription || false,
+    version: app.data.version || '',
+    developer: app.data.developer || '',
+    rating: app.data.rating || 0,
+    downloadLink: app.data.downloadLink || ''
+  }))
+];
+
+// Map websites to resources
+allResources = [
+  ...allResources,
+  ...sortedWebsites.map((website) => ({
+    type: 'website' as const,
+    data: website,
+    slug: website.slug,
+    title: website.data.title,
+    description: website.data.description || '',
+    image: website.data.image || '/images/default-website.png',
+    pubDate: website.data.pubDate || new Date(),
+    updatedDate: website.data.updatedDate,
+    isSponsored: website.data.isSponsored || false,
+    categories: website.data.categories || [],
+    url: website.data.url || '',
+    technologies: website.data.technologies || [],
+    services: website.data.services || [],
+    hasFreeTier: website.data.hasFreeTier || false,
+    hasPaidPlan: website.data.hasPaidPlan || false,
+    monthlyPrice: website.data.monthlyPrice || 0,
+    currency: website.data.currency || 'USD',
+    rating: website.data.rating || 0
+  }))
+];
 
 // Sort combined resources by date
-let filteredResources = allResources.sort((a, b) => b.date.valueOf() - a.date.valueOf());
+let filteredResources = allResources.sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 
-// Enhanced filtering - allow filtering by main category or custom tag
+// Filter by content type
 if (contentType && contentType !== 'all') {
-  filteredResources = filteredResources.filter(resource => {
-    // Check if it matches primary category (case-insensitive)
-    if (resource.primaryCategory.toLowerCase() === contentType.toLowerCase()) {
-      return true;
-    }
-    // Otherwise check collection type (but be careful with the type comparison)
-    return resource.type === contentType;
-  });
-}
-
-// Filter by tag if specified
-if (tag && tag !== 'all') {
-  filteredResources = filteredResources.filter(resource => 
-    resource.tags && resource.tags.includes(tag)
+  filteredResources = filteredResources.filter(resource =>
+    resource.type === contentType
   );
 }
 
-// Limit the number of resources if specified
-if (limit) {
-  filteredResources = filteredResources.slice(0, limit);
+// Filter by tag/category
+if (tag && tag !== 'all') {
+  filteredResources = filteredResources.filter(resource => {
+    if (resource.type === 'blog' && resource.tags) {
+      return resource.tags.includes(tag);
+    } else if (resource.categories) {
+      return resource.categories.includes(tag);
+    }
+    return false;
+  });
 }
 
-// Get all primary categories for the filter
-const allPrimaryCategories = [...new Set(allResources.map(r => r.primaryCategory))].sort();
+// Apply limit
+if (limit && !tag) {
+  filteredResources = filteredResources.slice(0, limit);
+} else if (limit && tag) {
+  filteredResources = filteredResources.slice(0, Math.max(30, limit));
+}
 
-// Get all unique tags from all resources
-const allTags = [...new Set(allResources.flatMap(r => r.tags))].sort();
+// Get all unique tags/categories from all resources
+const allTagsSet = new Set<string>();
+filteredResources.forEach(resource => {
+  if (resource.type === 'blog' && resource.tags) {
+    resource.tags.forEach(tag => allTagsSet.add(tag));
+  } else if (resource.categories) {
+    resource.categories.forEach(category => allTagsSet.add(category));
+  }
+});
+const allTags = Array.from(allTagsSet).sort();
 
-// Calculate counts for each primary category - case insensitive matching
+// Calculate counts for each content type
 const categoryCounts = {
   all: allResources.length,
-  Article: allResources.filter(r => r.primaryCategory.toLowerCase() === 'article').length,
-  Product: allResources.filter(r => r.primaryCategory.toLowerCase() === 'product').length,
-  Website: allResources.filter(r => r.primaryCategory.toLowerCase() === 'website').length,
-  App: allResources.filter(r => r.primaryCategory.toLowerCase() === 'app').length,
+  blog: allResources.filter(r => r.type === 'blog').length,
+  product: allResources.filter(r => r.type === 'product').length,
+  website: allResources.filter(r => r.type === 'website').length,
+  app: allResources.filter(r => r.type === 'app').length,
 };
 
 // Calculate debug information
@@ -209,13 +263,16 @@ const totalResources = filteredResources.length;
         <ul>
           <li>Blog collection: {blogCount} items</li>
           <li>Product collection: {productCount} items</li>
+          <li>App collection: {appCount} items</li>
+          <li>Website collection: {websiteCount} items</li>
           <li>Total resources loaded: {totalResources}</li>
-          <li>Articles: {categoryCounts.Article}</li>
-          <li>Products: {categoryCounts.Product}</li>
-          <li>Websites: {categoryCounts.Website}</li>
-          <li>Apps: {categoryCounts.App}</li>
+          <li>Blog Posts: {categoryCounts.blog}</li>
+          <li>Products: {categoryCounts.product}</li>
+          <li>Websites: {categoryCounts.website}</li>
+          <li>Apps: {categoryCounts.app}</li>
           <li>Current filter: {contentType}</li>
           <li>Tag filter: {tag || 'none'}</li>
+          <li>Include All Dates: {includeAllDates ? 'Yes' : 'No'}</li>
         </ul>
       </div>
     )}
@@ -229,13 +286,13 @@ const totalResources = filteredResources.length;
         <input type="text" id="resource-search" placeholder="Search..." />
       </div>
       
-      <!-- Content type filter - using primary categories -->
+      <!-- Content type filter tabs -->
       <div class="content-type-tabs">
-        <button class="content-type-tab active" data-type="all">All Items ({categoryCounts.all})</button>
-        <button class="content-type-tab" data-type="article">Articles ({categoryCounts.Article})</button>
-        <button class="content-type-tab" data-type="product">Products ({categoryCounts.Product})</button>
-        <button class="content-type-tab" data-type="website">Websites ({categoryCounts.Website})</button>
-        <button class="content-type-tab" data-type="app">Apps ({categoryCounts.App})</button>
+        <button class="content-type-tab active" data-type="all">All</button>
+        <button class="content-type-tab" data-type="blog">Blog Posts</button>
+        <button class="content-type-tab" data-type="product">Products</button>
+        <button class="content-type-tab" data-type="website">Websites</button>
+        <button class="content-type-tab" data-type="app">Apps</button>
         
         <button class="content-type-tab shuffle-button" data-action="shuffle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
@@ -249,11 +306,11 @@ const totalResources = filteredResources.length;
         </button>
       </div>
       
-      <!-- Tags filter - enhanced with custom categories -->
+      <!-- Tags filter -->
       <div class="tags-filter">
         <h3 class="filter-title">Filter by tags</h3>
         <div class="filter-tabs" id="tag-filters">
-          <button class="filter-tab active" data-tag="all">All Tags</button>
+          <button class="filter-tab active" data-tag="all">ALL</button>
           {allTags.map((tagName) => (
             <button class="filter-tab" data-tag={tagName}>{tagName}</button>
           ))}
@@ -264,17 +321,72 @@ const totalResources = filteredResources.length;
     <!-- Resource cards grid -->
     <div class="resources-grid" id="resources-container">
       {filteredResources.length > 0 ? (
-        filteredResources.map((resource) => (
-          <ItemCard 
-            title={resource.title}
-            link={`/${resource.type}/${resource.slug}`}
-            description={resource.description}
-            tags={resource.tags}
-            type={resource.displayType || resource.primaryCategory}
-            isSponsored={resource.isSponsored}
-            contentType={resource.type}
-          />
-        ))
+        filteredResources.map((resource) => {
+          // Base props for all content types
+          const baseProps = {
+            title: resource.title,
+            link: `/${resource.type}/${resource.slug}`,
+            description: resource.description,
+            contentType: resource.type,
+            isSponsored: resource.isSponsored,
+            pubDate: resource.pubDate.toISOString(),
+            updatedDate: resource.updatedDate?.toISOString(),
+            image: resource.image,
+          };
+          
+          // Add specific props based on content type
+          let specificProps = {};
+          
+          if (resource.type === 'blog') {
+            specificProps = {
+              tags: resource.tags || [],
+              type: resource.type || '',
+            };
+          } 
+          else if (resource.type === 'product') {
+            specificProps = {
+              categories: resource.categories || [],
+              price: resource.price || 0,
+              currency: resource.currency || 'USD',
+              rating: resource.rating || 0,
+              affiliateLink: resource.affiliateLink || '',
+            };
+          }
+          else if (resource.type === 'app') {
+            specificProps = {
+              categories: resource.categories || [],
+              platform: resource.platform || [],
+              price: resource.price || 0,
+              currency: resource.currency || 'USD',
+              rating: resource.rating || 0,
+              developer: resource.developer || '',
+              version: resource.version || '',
+              isFreemium: resource.isFreemium || false,
+              hasSubscription: resource.hasSubscription || false,
+              downloadLink: resource.downloadLink || '',
+            };
+          }
+          else if (resource.type === 'website') {
+            specificProps = {
+              categories: resource.categories || [],
+              url: resource.url || '',
+              technologies: resource.technologies || [],
+              services: resource.services || [],
+              hasFreeTier: resource.hasFreeTier || false,
+              hasPaidPlan: resource.hasPaidPlan || false,
+              monthlyPrice: resource.monthlyPrice || 0,
+              currency: resource.currency || 'USD',
+              rating: resource.rating || 0,
+            };
+          }
+          
+          // Merge the base props with specific props
+          const props = {...baseProps, ...specificProps};
+          
+          return (
+            <ItemCard {...props} />
+          );
+        })
       ) : (
         <div class="no-resources">
           <p>No resources found matching the current filters.</p>
@@ -282,25 +394,20 @@ const totalResources = filteredResources.length;
       )}
     </div>
     
-    {debug && productCount === 0 && (
+    <!-- Pagination -->
+    <div id="pagination-container" class="pagination-container"></div>
+    
+    {debug && (productCount === 0 || appCount === 0 || websiteCount === 0) && (
       <div class="debug-help">
-        <h3>Troubleshooting: No Products Found</h3>
-        <p>It looks like no product files were found in your content collection. Here's what to check:</p>
+        <h3>Troubleshooting: Missing Collections</h3>
+        <p>It looks like some of your collections might not have any items. Here's what to check:</p>
         <ul>
-          <li>Make sure you have created product files in <code>src/content/products/</code> directory</li>
-          <li>Ensure your content schema in <code>src/content/config.ts</code> has a products collection defined</li>
-          <li>Check that your product files have the correct frontmatter structure</li>
+          {productCount === 0 && <li>Make sure you have created product files in <code>src/content/products/</code> directory</li>}
+          {appCount === 0 && <li>Make sure you have created app files in <code>src/content/apps/</code> directory</li>}
+          {websiteCount === 0 && <li>Make sure you have created website files in <code>src/content/websites/</code> directory</li>}
+          <li>Ensure your content schema in <code>src/content/config.ts</code> has all collections defined</li>
+          <li>Check that your content files have the correct frontmatter structure</li>
         </ul>
-        <p>Sample product frontmatter:</p>
-        <pre><code>---
-title: "Product Title"
-description: "Product description"
-pubDate: 2024-03-22
-image: "/images/products/example.jpg"
-type: "Product" # This determines the primary category
-categories: ["Category1", "Category2"]
-isSponsored: false
----</code></pre>
       </div>
     )}
   </div>
@@ -416,6 +523,8 @@ isSponsored: false
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
+    min-width: 200px;
+    
   }
   
   .no-resources {
@@ -528,237 +637,316 @@ isSponsored: false
     opacity: 1;
     transition: all 0.3s ease-in-out;
   }
+  /* Add these styles to your existing <style> block */
+    .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: var(--spacing-lg);
+    gap: var(--spacing-md);
+  }
+  
+  .pagination-button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-white);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .pagination-button:hover:not(:disabled) {
+    background-color: var(--color-primary-light);
+    color: var(--color-white);
+  }
+  
+  .pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .page-indicator {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    padding: var(--spacing-sm);
+  }
+  
+  @media (max-width: 640px) {
+    .pagination-container {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+  }
 </style>
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-  // Get elements
-  const contentTypeTabs = document.querySelectorAll('.content-type-tab');
-  const filterTabs = document.querySelectorAll('.filter-tab');
-  const resourceCards = document.querySelectorAll('.card.resource-card');
-  const searchInput = document.getElementById('resource-search');
-  const shuffleButton = document.querySelector('.shuffle-button');
-  const resourcesContainer = document.getElementById('resources-container');
-  
-  // Debug elements
-  const currentContentTypeEl = document.getElementById('current-content-type');
-  const currentTagEl = document.getElementById('current-tag');
-  const currentSearchEl = document.getElementById('current-search');
-  const visibleCountEl = document.getElementById('visible-count');
-  const filterDebug = document.getElementById('filter-debug');
-  
-  if (filterDebug) {
-    filterDebug.style.display = 'block';
-  }
-  
-  let activeContentType = 'all';
-  let activeTag = 'all';
-  let isShuffled = false;
-  
-  // Debug log all available resource cards
-  console.log("=== RESOURCE FILTERING DEBUG ===");
-  console.log(`Found ${resourceCards.length} resource cards total`);
-  
-  // Process all resource cards to normalize their primary categories
-  resourceCards.forEach(card => {
-    const title = card.querySelector('h3')?.textContent || 'Unknown';
-    const contentType = card.getAttribute('data-content-type');
+    // Get elements
+    const contentTypeTabs = document.querySelectorAll('.content-type-tab');
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const resourceCards = document.querySelectorAll('.card.resource-card');
+    const searchInput = document.getElementById('resource-search');
+    const shuffleButton = document.querySelector('.shuffle-button');
+    const resourcesContainer = document.getElementById('resources-container');
+    const paginationContainer = document.getElementById('pagination-container');
     
-    // Get primary category and normalize it
-    let primaryCategory = card.getAttribute('data-primary-category') || '';
-    primaryCategory = primaryCategory.toLowerCase();
+    // Pagination settings
+    const postsPerPage = 9; // Set how many posts to show per page
+    let currentPage = 1;
+    let filteredCards = []; // Store filtered cards for pagination
     
-    // Normalize plural forms to singular
-    if (primaryCategory === 'apps') {
-      primaryCategory = 'app';
-      card.setAttribute('data-primary-category', 'app');
-    } else if (primaryCategory === 'websites') {
-      primaryCategory = 'website';
-      card.setAttribute('data-primary-category', 'website');
-    }
+    let activeContentType = 'all';
+    let activeTag = 'all';
+    let isShuffled = false;
     
-    // Check tags for additional categorization
-    const tagElements = card.querySelectorAll('.tag');
-    const tags = Array.from(tagElements).map(tag => tag.textContent.trim().toLowerCase());
+    // Debug log all available resource cards
+    console.log("=== RESOURCE FILTERING DEBUG ===");
+    console.log(`Found ${resourceCards.length} resource cards total`);
     
-    // If tags indicate website or app and primary category doesn't, update it
-    if (primaryCategory !== 'website' && primaryCategory !== 'app') {
-      if (tags.includes('website')) {
-        primaryCategory = 'website';
-        card.setAttribute('data-primary-category', 'website');
-      } else if (tags.includes('app')) {
-        primaryCategory = 'app';
-        card.setAttribute('data-primary-category', 'app');
-      }
-    }
+    // Process all resource cards to ensure they have proper data attributes
+    resourceCards.forEach(card => {
+      const title = card.querySelector('.card-title')?.textContent || 'Unknown';
+      const contentType = card.getAttribute('data-content-type');
+      
+      // Get the tag data for logging
+      const tagsStr = card.getAttribute('data-tags') || '';
+      const tags = tagsStr ? tagsStr.split(',') : [];
+      
+      // Get the publication date for debugging
+      const pubDate = card.getAttribute('data-pub-date') || 'No date';
+      
+      console.log(`Card: "${title}", Type: ${contentType}, Tags: [${tags.join(', ')}], Date: ${pubDate}`);
+    });
     
-    console.log(`Card: "${title}", Type: ${contentType}, Primary Category: ${primaryCategory}, Tags: [${tags.join(', ')}]`);
-  });
-  
-  // Filter by content type
-  contentTypeTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      // Don't change active state for the shuffle button
-      if (tab.getAttribute('data-action') === 'shuffle') {
-        shuffleVisibleCards();
+    // Filter by content type
+    contentTypeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Don't change active state for the shuffle button
+        if (tab.getAttribute('data-action') === 'shuffle') {
+          shuffleVisibleCards();
+          return;
+        }
+        
+        // Update active tab
+        contentTypeTabs.forEach(t => {
+          if (!t.classList.contains('shuffle-button')) {
+            t.classList.remove('active');
+          }
+        });
+        tab.classList.add('active');
+        
+        activeContentType = tab.getAttribute('data-type');
+        console.log(`Content type filter changed to: ${activeContentType}`);
+        
+        // Reset to page 1 when changing filters
+        currentPage = 1;
+        filterResources();
+      });
+    });
+    
+    // Filter by tag/category
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tagValue = tab.getAttribute('data-tag');
+        console.log(`Tag tab clicked: ${tab.textContent} with data-tag=${tagValue}`);
+        
+        // Update active tab
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        activeTag = tagValue;
+        console.log(`Tag filter changed to: ${activeTag}`);
+        
+        // Reset to page 1 when changing filters
+        currentPage = 1;
+        filterResources();
+      });
+    });
+    
+    // Filter by search term
+    searchInput?.addEventListener('input', () => {
+      // Reset to page 1 when searching
+      currentPage = 1;
+      filterResources();
+    });
+    
+    // Create pagination controls
+    function createPagination(totalItems) {
+      if (!paginationContainer) return;
+      
+      // Clear existing pagination
+      paginationContainer.innerHTML = '';
+      
+      // Calculate total pages
+      const totalPages = Math.ceil(totalItems / postsPerPage);
+      
+      // Don't show pagination if only one page
+      if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
         return;
       }
       
-      // Update active tab
-      contentTypeTabs.forEach(t => {
-        if (!t.classList.contains('shuffle-button')) {
-          t.classList.remove('active');
+      paginationContainer.style.display = 'flex';
+      
+      // Previous button
+      const prevButton = document.createElement('button');
+      prevButton.classList.add('pagination-button', 'prev-button');
+      prevButton.textContent = '← Prev';
+      prevButton.disabled = currentPage === 1;
+      prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          updatePageDisplay();
         }
       });
-      tab.classList.add('active');
       
-      activeContentType = tab.getAttribute('data-type');
-      if (currentContentTypeEl) currentContentTypeEl.textContent = activeContentType;
-      console.log(`Content type filter changed to: ${activeContentType}`);
-      filterResources();
-    });
-  });
-  
-  // Filter by tag/category
-  filterTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      console.log(`Tag tab clicked: ${tab.textContent} with data-tag=${tab.getAttribute('data-tag')}`);
-      
-      // Update active tab
-      filterTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      
-      activeTag = tab.getAttribute('data-tag');
-      if (currentTagEl) currentTagEl.textContent = activeTag;
-      console.log(`Tag filter changed to: ${activeTag}`);
-      filterResources();
-    });
-  });
-  
-  // Filter by search term
-  searchInput.addEventListener('input', () => {
-    if (currentSearchEl) currentSearchEl.textContent = searchInput.value || 'none';
-    filterResources();
-  });
-  
-  // Shuffle function to randomize visible cards
-  function shuffleVisibleCards() {
-    const visibleCards = Array.from(resourceCards).filter(card => 
-      card.style.display !== 'none'
-    );
-    
-    console.log(`Shuffling ${visibleCards.length} visible cards`);
-    
-    // Fisher-Yates shuffle algorithm
-    for (let i = visibleCards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      // Mark as shuffled to add animation
-      visibleCards[i].classList.add('shuffled');
-      visibleCards[j].classList.add('shuffled');
-      // Append to move in DOM (which changes display order)
-      resourcesContainer.appendChild(visibleCards[i]);
-      resourcesContainer.appendChild(visibleCards[j]);
-    }
-    
-    // Add shuffled status to debug
-    isShuffled = true;
-    if (currentContentTypeEl) {
-      currentContentTypeEl.textContent += ' (shuffled)';
-    }
-    
-    // Add animation effect
-    setTimeout(() => {
-      visibleCards.forEach(card => {
-        card.classList.remove('shuffled');
-        card.classList.add('shuffle-complete');
+      // Next button
+      const nextButton = document.createElement('button');
+      nextButton.classList.add('pagination-button', 'next-button');
+      nextButton.textContent = 'Next →';
+      nextButton.disabled = currentPage === totalPages;
+      nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          updatePageDisplay();
+        }
       });
       
-      setTimeout(() => {
-        visibleCards.forEach(card => {
-          card.classList.remove('shuffle-complete');
-        });
-      }, 300);
-    }, 10);
-  }
-  
-  // Enhanced filtering function to work with your ResourceItem component
-  function filterResources() {
-    const searchTerm = searchInput.value.toLowerCase();
-    let visibleCount = 0;
+      // Page indicator
+      const pageIndicator = document.createElement('span');
+      pageIndicator.classList.add('page-indicator');
+      pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+      
+      // Add elements to container
+      paginationContainer.appendChild(prevButton);
+      paginationContainer.appendChild(pageIndicator);
+      paginationContainer.appendChild(nextButton);
+    }
     
-    console.log(`=== FILTERING RESOURCES ===`);
-    console.log(`Active content type: ${activeContentType}`);
-    console.log(`Active tag: ${activeTag}`);
-    console.log(`Search term: ${searchTerm}`);
-    
-    resourceCards.forEach(card => {
-      // Get card data for filtering
-      const cardContentType = card.getAttribute('data-content-type');
-      const cardPrimaryCategory = (card.getAttribute('data-primary-category') || '').toLowerCase();
-      const title = card.querySelector('h3')?.textContent || '';
-      const tagElements = card.querySelectorAll('.tag');
-      const tags = Array.from(tagElements).map(tag => tag.textContent.trim().toLowerCase());
-      const description = card.querySelector('p')?.textContent.toLowerCase() || '';
-      
-      // Debug this card
-      console.log(`Checking card: "${title}", Type: ${cardContentType}, Primary Category: ${cardPrimaryCategory}, Tags: [${tags.join(', ')}]`);
-      
-      // Enhanced content type matching - check both primary category and content type
-      let contentTypeMatch = false;
-      if (activeContentType === 'all') {
-        contentTypeMatch = true;
-      } else {
-        // Match against primary category (case-insensitive)
-        contentTypeMatch = (cardPrimaryCategory === activeContentType.toLowerCase());
-      }
-      
-      // Check tag match
-      const tagMatch = activeTag === 'all' || tags.includes(activeTag.toLowerCase());
-      
-      // Check search match
-      const searchMatch = searchTerm === '' || 
-                         title.toLowerCase().includes(searchTerm) || 
-                         description.includes(searchTerm) || 
-                         tags.some(tag => tag.includes(searchTerm));
-      
-      // Log the matching results
-      console.log(`- Content type match: ${contentTypeMatch}`);
-      console.log(`- Tag match: ${tagMatch} (looking for "${activeTag}" in [${tags.join(', ')}])`);
-      console.log(`- Search match: ${searchMatch}`);
-      
-      // Apply combined filtering
-      if (contentTypeMatch && tagMatch && searchMatch) {
-        card.style.display = '';
-        visibleCount++;
-        console.log(`✅ Card "${title}" PASSED all filters`);
-      } else {
+    // Update page display based on current page
+    function updatePageDisplay() {
+      // Hide all cards first
+      filteredCards.forEach(card => {
         card.style.display = 'none';
-        console.log(`❌ Card "${title}" FAILED filtering`);
+      });
+      
+      // Calculate start and end index for current page
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const endIndex = Math.min(startIndex + postsPerPage, filteredCards.length);
+      
+      // Show cards for current page
+      for (let i = startIndex; i < endIndex; i++) {
+        filteredCards[i].style.display = '';
       }
-    });
-    
-    // Reset shuffle status when filter changes
-    isShuffled = false;
-    if (currentContentTypeEl) {
-      currentContentTypeEl.textContent = activeContentType;
+      
+      // Update pagination controls
+      createPagination(filteredCards.length);
+      
+      // Scroll to top of resources container
+      resourcesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
-    // Update debug counter
-    if (visibleCountEl) {
-      visibleCountEl.textContent = visibleCount.toString();
+    // Shuffle function to randomize visible cards
+    function shuffleVisibleCards() {
+      // Shuffle the filtered cards array
+      for (let i = filteredCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        // Mark as shuffled to add animation
+        filteredCards[i].classList.add('shuffled');
+        filteredCards[j].classList.add('shuffled');
+        // Swap elements
+        [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+      }
+      
+      // Add shuffled status to debug
+      isShuffled = true;
+      
+      // Reset to page 1 after shuffling
+      currentPage = 1;
+      
+      // Update display
+      updatePageDisplay();
+      
+      // Add animation effect
+      setTimeout(() => {
+        filteredCards.forEach(card => {
+          card.classList.remove('shuffled');
+          card.classList.add('shuffle-complete');
+        });
+        
+        setTimeout(() => {
+          filteredCards.forEach(card => {
+            card.classList.remove('shuffle-complete');
+          });
+        }, 300);
+      }, 10);
     }
     
-    console.log(`=== FILTERING COMPLETE: ${visibleCount} visible items ===`);
-    
-    // Show a message if no results are found
-    const noResultsEl = document.querySelector('.no-resources');
-    if (noResultsEl) {
-      noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
+    // Enhanced filtering function
+    function filterResources() {
+      const searchTerm = searchInput?.value?.toLowerCase() || '';
+      
+      console.log(`=== FILTERING RESOURCES ===`);
+      console.log(`Active content type: ${activeContentType}`);
+      console.log(`Active tag: ${activeTag}`);
+      console.log(`Search term: ${searchTerm}`);
+      
+      // Reset filtered cards array
+      filteredCards = [];
+      
+      resourceCards.forEach(card => {
+        // Get card data for filtering
+        const cardContentType = card.getAttribute('data-content-type');
+        const title = card.querySelector('.card-title')?.textContent || '';
+        const description = card.querySelector('p')?.textContent?.toLowerCase() || '';
+        
+        // Get tags from data attribute
+        const tagsStr = card.getAttribute('data-tags-lower') || card.getAttribute('data-tags') || '';
+        const tags = tagsStr ? tagsStr.toLowerCase().split(',') : [];
+        
+        // Content type matching
+        let contentTypeMatch = activeContentType === 'all' || cardContentType === activeContentType;
+        
+        // Check tag match - use case-insensitive comparison
+        const activeTagLower = activeTag.toLowerCase();
+        const tagMatch = activeTag === 'all' || tags.includes(activeTagLower);
+        
+        // Check search match
+        const searchMatch = searchTerm === '' || 
+                           title.toLowerCase().includes(searchTerm) || 
+                           description?.includes(searchTerm) || 
+                           tags.some(tag => tag.includes(searchTerm));
+        
+        // Apply combined filtering
+        if (contentTypeMatch && tagMatch && searchMatch) {
+          filteredCards.push(card);
+          console.log(`✅ Card "${title}" PASSED all filters`);
+        } else {
+          card.style.display = 'none';
+          console.log(`❌ Card "${title}" FAILED filtering`);
+        }
+      });
+      
+      // Update the page display
+      updatePageDisplay();
+      
+      // Reset shuffle status when filter changes
+      isShuffled = false;
+      
+      console.log(`=== FILTERING COMPLETE: ${filteredCards.length} visible items ===`);
+      
+      // Show a message if no results are found
+      const noResultsEl = document.querySelector('.no-resources');
+      if (noResultsEl) {
+        noResultsEl.style.display = filteredCards.length === 0 ? 'block' : 'none';
+      }
     }
-  }
-  
-  // Initialize filtering on load
-  console.log("Initializing resource filtering...");
-  filterResources();
-});
-</script>
+    
+    // Initialize filtering on load
+    console.log("Initializing resource filtering...");
+    filterResources();
+  });
+  </script>

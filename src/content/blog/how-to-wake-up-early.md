@@ -3,8 +3,8 @@ title: "How to Wake Up Early"
 description: "A step-by-step guide to waking up early and living a more productive life."
 pubDate: 2025-03-26
 image: "/images/blog/wake-up-early.jpg"
-tags: ["Productivity", "Money", "Chill", "Laziness"]
-type: "Article"
+tags: ["Productivity", "Health"]
+type: "Blog"
 ---
 
 ## Introduction

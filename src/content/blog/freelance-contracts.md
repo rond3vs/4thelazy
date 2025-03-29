@@ -3,8 +3,8 @@ title: "Digital Minimalism: How I Reclaimed 3 Hours Per Day By Deleting Almost E
 description: "The counterintuitive path to digital productivity isn't more apps—it's fewer."
 pubDate: 2025-03-15
 image: "/images/blog/digital-minimalism.jpg"
-tags: ["Productivity", "Money", "Chill", "Laziness"]
-type: "Article"
+tags: ["Productivity"]
+type: "Blog"
 ---
 
 Six months ago, my digital life was a chaotic mess. 147 desktop icons. 230+ browser bookmarks. 17 productivity apps. Countless notifications interrupting my day. I was drowning in digital clutter while ironically downloading more apps promising to help me stay organized.

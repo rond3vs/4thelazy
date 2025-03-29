@@ -7,6 +7,7 @@ categories: ["Money"]
 isSponsored: false
 type: "Product"
 productType: "App"
+affiliateLink: "https://4thelazy.com/products/freelance-contract-template"
 ---
 
 ## What's Included

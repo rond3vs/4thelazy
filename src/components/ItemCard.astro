@@ -1,183 +1,266 @@
 ---
 // src/components/ItemCard.astro
-interface Props {
+// Common properties for all card types
+interface BaseProps {
   title: string;
+  description?: string;
   link: string;
-  description: string;
-  tags: string[];
-  type: string; // This receives the displayType from ResourceGrid
+  image?: string; // Still included in interface but not used in component
+  contentType: 'blog' | 'product' | 'app' | 'website';
   isSponsored?: boolean;
-  contentType: 'blog' | 'product';
+  pubDate?: string;
+  updatedDate?: string;
 }
 
-const { title, link, description, tags, type, isSponsored = false, contentType } = Astro.props;
-
-// Determine the primary label (what shows on the left)
-let primaryLabel = contentType === 'blog' ? 'Article' : 'Product';
-
-// Determine the content type label (what shows on the right)
-let contentTypeLabel = type;
-
-// Set the primary category for filtering based on type field
-// Convert to lowercase for comparison and normalize "Apps" to "app"
-let primaryCategory = type.toLowerCase();
-if (primaryCategory === 'apps') {
-  primaryCategory = 'app';
-} else if (primaryCategory === 'websites') {
-  primaryCategory = 'website';
+// Blog-specific properties
+interface BlogProps extends BaseProps {
+  contentType: 'blog';
+  tags?: string[];
+  type?: string;
 }
 
-// Check tags for Website or App if not already set
-if (primaryCategory !== 'app' && primaryCategory !== 'website') {
-  if (tags) {
-    for (const tag of tags) {
-      const tagLC = tag.toLowerCase();
-      if (tagLC === 'website') {
-        primaryCategory = 'website';
-        break;
-      } else if (tagLC === 'app') {
-        primaryCategory = 'app';
-        break;
-      }
-    }
+// Product-specific properties
+interface ProductProps extends BaseProps {
+  contentType: 'product';
+  categories?: string[];
+  price?: number;
+  currency?: string;
+  rating?: number;
+  affiliateLink?: string;
+}
+
+// App-specific properties
+interface AppProps extends BaseProps {
+  contentType: 'app';
+  categories?: string[];
+  platform?: string[];
+  price?: number;
+  currency?: string;
+  rating?: number;
+  developer?: string;
+  version?: string;
+  isFreemium?: boolean;
+  hasSubscription?: boolean;
+  downloadLink?: string;
+}
+
+// Website-specific properties
+interface WebsiteProps extends BaseProps {
+  contentType: 'website';
+  categories?: string[];
+  url?: string;
+  technologies?: string[];
+  services?: string[];
+  hasFreeTier?: boolean;
+  hasPaidPlan?: boolean;
+  monthlyPrice?: number;
+  currency?: string;
+  rating?: number;
+}
+
+// Union type of all possible props
+type Props = BlogProps | ProductProps | AppProps | WebsiteProps;
+
+// Get all props
+const props = Astro.props as Props;
+
+// Common properties
+const {
+  title,
+  description = "",
+  link,
+  contentType,
+  isSponsored = false,
+  pubDate,
+} = props;
+
+// Format date for display
+const formatDate = (dateString: string | undefined) => {
+  if (!dateString) return "";
+  
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+// Get content-specific tags/categories
+const getTags = () => {
+  if (contentType === 'blog' && 'tags' in props) {
+    return props.tags;
+  } else if (contentType !== 'blog' && 'categories' in props) {
+    return props.categories;
   }
-}
+  return [];
+};
+
+// Check if the URL should be external
+const isExternal = 
+  (contentType === 'product' && 'affiliateLink' in props && !!props.affiliateLink) || 
+  (contentType === 'app' && 'downloadLink' in props && !!props.downloadLink) ||
+  (contentType === 'website' && 'url' in props && !!props.url);
+
+// Get the correct href for the card
+const getHref = () => {
+  if (contentType === 'product' && isAffiliate && 'affiliateLink' in props) {
+    return props.affiliateLink;
+  } else if (contentType === 'app' && 'downloadLink' in props && props.downloadLink) {
+    return props.downloadLink;
+  } else if (contentType === 'website' && 'url' in props && props.url) {
+    return props.url;
+  }
+  return link;
+};
+
+// Check if card is affiliate product
+const isAffiliate = contentType === 'product' && 'affiliateLink' in props && !!props.affiliateLink;
+
+// Get all tags and categories and join into comma-separated string for data attributes
+const allTagsString = getTags()?.join(',') || '';
+const allTagsLowercase = getTags()?.map(tag => tag.toLowerCase()).join(',') || '';
 ---
 
-<div class="card resource-card" data-content-type={contentType} data-primary-category={primaryCategory}>
-  <a href={link}>
-    <div class="content">
-      <div class="meta">
-        <span class="type">{primaryLabel}</span>
-        <span class="content-type">{contentTypeLabel}</span>
-        {isSponsored && <span class="sponsored">Sponsored</span>}
+<div class="resource-card card" 
+  data-content-type={contentType}
+  data-tags={allTagsString}
+  data-tags-lower={allTagsLowercase}
+  data-pub-date={pubDate}>
+  
+  <a href={getHref()} class="card-link" target={isExternal ? "_blank" : "_self"} rel={isExternal ? "noopener noreferrer" : ""}>
+    <div class="card-content">
+      <div class="card-header">
+        <div class="card-meta">
+          <!-- Badge for content type -->
+          <span class="content-badge">{contentType}</span>
+          
+          {isSponsored && <span class="sponsored-badge">Sponsored</span>}
+          
+          {pubDate && (
+            <span class="card-date">{formatDate(pubDate)}</span>
+          )}
+        </div>
+        <h3 class="card-title">{title}</h3>
+        
       </div>
       
-      <h3 class="card-title">{title}</h3>
+      {description && description.length > 0 && (
+        <p class="card-description">{description}</p>
+      )}
       
-      <div class="card-body">
-        {description && <p>{description}</p>}
-      </div>
-      
-      <div class="card-footer">
-        {tags?.length > 0 && (
-          <div class="tags">
-            {tags.map((tag) => (
-              <span class="tag" data-tag={tag}>{tag}</span>
-            ))}
-          </div>
-        )}
-      </div>
+      <!-- Display limited tags -->
+      {getTags() && getTags()!.length > 0 && (
+        <div class="card-tags">
+          {getTags()!.slice(0, 2).map((tag: string) => (
+            <span class="card-tag">{tag}</span>
+          ))}
+        </div>
+      )}
     </div>
   </a>
 </div>
 
 <style>
   .card {
+    border: solid 1px #333;
+   
     border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 2px solid var(--color-border);
-    background-color: var(--color-white);
-    display: flex;
-    flex-direction: column;
+    transition: transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     height: 100%;
   }
   
   .card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
-  a {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    color: inherit;
+  .card-link {
     text-decoration: none;
-  }
-  
-  a:hover {
-    text-decoration: none;
-  }
-  
-  .content {
-    padding: var(--spacing-md);
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+    color: var(--color-text);
+    display: block;
     height: 100%;
   }
   
-  .meta {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
+  .card-header {
     margin-bottom: var(--spacing-sm);
-    font-size: 0.8rem;
   }
   
-  .type {
-    padding: 0.1rem 0.4rem;
+  .card-image-wrapper,
+  .card-image {
+    display: none;
+  }
+  
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .content-badge {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.2em 0.5em;
     border-radius: var(--radius-sm);
-    font-weight: 600;
-    background-color: var(--color-primary-light);
-    color: var(--color-white);
+    font-size: 0.7rem;
+    text-transform: capitalize;
   }
   
-  .content-type {
-    font-weight: 600;
-    color: var(--color-primary);
-  }
-  
-  .sponsored {
-    margin-left: auto;
-    padding: 0.1rem 0.4rem;
-    background: rgba(0, 0, 0, 0.6);
-    color: var(--color-white);
+  .sponsored-badge {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 0.2em 0.5em;
     border-radius: var(--radius-sm);
     font-size: 0.7rem;
   }
   
-  .card-title {
-    margin: 0 0 var(--spacing-sm);
-    font-size: var(--font-size-lg);
-    line-height: 1.4;
-    color: var(--color-primary-dark);
-  }
-  
-  .card-body {
-    flex-grow: 1;
-  }
-  
-  p {
-    margin: 0 0 var(--spacing-md);
-    font-size: 1rem;
-    color: var(--color-text);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .card-footer {
-    margin-top: auto;
-    padding-top: var(--spacing-sm);
-  }
-  
-  .tags {
+  .card-content {
+    padding: var(--spacing-md);
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-    font-size: 0.75rem;
+    flex-direction: column;
+    height: 100%;
   }
   
-  .tags span {
-    padding: 0.15rem 0.35rem;
-    background: rgba(32, 106, 93, 0.1);
-    border-radius: var(--radius-full);
+  .card-title {
+    margin-bottom: var(--spacing-sm);
+    font-size: 1.16rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.3;
+  }
+  
+  .card-description {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    margin-top: auto;
+    margin-bottom: var(--spacing-sm);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .card-date {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+  }
+  
+  .card-tags {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: auto;
+  }
+  
+  .card-tag {
+    background-color: rgba(32, 106, 93, 0.1);
     color: var(--color-primary);
-    margin-right: var(--spacing-xs);
+    padding: 0.2em 0.5em;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
   }
 </style>
