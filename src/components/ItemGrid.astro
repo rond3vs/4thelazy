@@ -15,7 +15,7 @@ interface Props {
 
 // Enhanced resource interface to support all collection types
 interface Resource {
-  type: 'blog' | 'product' | 'app' | 'website'; // All supported collection types
+  type: 'blog' | 'product' | 'app' | 'website';
   data: CollectionEntry<'blog'> | CollectionEntry<'products'> | CollectionEntry<'apps'> | CollectionEntry<'websites'>;
   slug: string;
   title: string;
@@ -58,11 +58,11 @@ const {
   includeAllDates = true
 } = Astro.props;
 
-// Get all collections
-const allBlogPosts = await getCollection('blog');
-const allProducts = await getCollection('products');
-const allApps = await getCollection('apps');
-const allWebsites = await getCollection('websites');
+// Get all collections and filter out drafts (assuming missing pubDate means a draft)
+const allBlogPosts = (await getCollection('blog')).filter(post => !!post.data.pubDate);
+const allProducts = (await getCollection('products')).filter(product => !!product.data.pubDate);
+const allApps = (await getCollection('apps')).filter(app => !!app.data.pubDate);
+const allWebsites = (await getCollection('websites')).filter(website => !!website.data.pubDate);
 
 // Collection counts for debugging
 const blogCount = allBlogPosts.length;
@@ -85,27 +85,10 @@ if (debug) {
 }
 
 // Sort collections by publication date (newest first)
-const sortedBlogPosts = allBlogPosts.sort((a, b) => 
-  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
-
-const sortedProducts = allProducts.sort((a, b) => {
-  const dateA = a.data.pubDate || new Date();
-  const dateB = b.data.pubDate || new Date();
-  return dateB.valueOf() - dateA.valueOf();
-});
-
-const sortedApps = allApps.sort((a, b) => {
-  const dateA = a.data.pubDate || new Date();
-  const dateB = b.data.pubDate || new Date();
-  return dateB.valueOf() - dateA.valueOf();
-});
-
-const sortedWebsites = allWebsites.sort((a, b) => {
-  const dateA = a.data.pubDate || new Date();
-  const dateB = b.data.pubDate || new Date();
-  return dateB.valueOf() - dateA.valueOf();
-});
+const sortedBlogPosts = allBlogPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedProducts = allProducts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedApps = allApps.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedWebsites = allWebsites.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 // Combine and prepare all resources
 let allResources: Resource[] = [];
@@ -119,12 +102,12 @@ allResources = [
     slug: post.slug,
     title: post.data.title,
     description: post.data.description || '',
-    image: post.data.image || '/images/default-blog.png',
+    image: '', // No image
     pubDate: post.data.pubDate,
     updatedDate: post.data.updatedDate,
     isSponsored: post.data.isSponsored || false,
     tags: post.data.tags || []
-  }))
+  }) as Resource)
 ];
 
 // Map products to resources
@@ -136,16 +119,11 @@ allResources = [
     slug: product.slug,
     title: product.data.title,
     description: product.data.description || '',
-    image: product.data.image || '/images/default-product.png',
+    image: '',
     pubDate: product.data.pubDate || new Date(),
     updatedDate: product.data.updatedDate,
-    isSponsored: product.data.isSponsored || false,
-    categories: product.data.categories || [],
-    price: product.data.price || 0,
-    currency: product.data.currency || 'USD',
-    rating: product.data.rating || 0,
     affiliateLink: product.data.affiliateLink || ''
-  }))
+  }) as Resource)
 ];
 
 // Map apps to resources
@@ -157,21 +135,14 @@ allResources = [
     slug: app.slug,
     title: app.data.title,
     description: app.data.description || '',
-    image: app.data.image || '/images/default-app.png',
+    image: '',
     pubDate: app.data.pubDate || new Date(),
     updatedDate: app.data.updatedDate,
     isSponsored: app.data.isSponsored || false,
-    categories: app.data.categories || [],
     platform: app.data.platform || [],
-    price: app.data.price || 0,
-    currency: app.data.currency || 'USD',
-    isFreemium: app.data.isFreemium || false,
-    hasSubscription: app.data.hasSubscription || false,
-    version: app.data.version || '',
-    developer: app.data.developer || '',
-    rating: app.data.rating || 0,
-    downloadLink: app.data.downloadLink || ''
-  }))
+    downloadLink: app.data.downloadLink || '',
+    tags: app.data.tags || []
+  }) as Resource)
 ];
 
 // Map websites to resources
@@ -183,20 +154,13 @@ allResources = [
     slug: website.slug,
     title: website.data.title,
     description: website.data.description || '',
-    image: website.data.image || '/images/default-website.png',
+    image: '',
     pubDate: website.data.pubDate || new Date(),
     updatedDate: website.data.updatedDate,
     isSponsored: website.data.isSponsored || false,
-    categories: website.data.categories || [],
     url: website.data.url || '',
-    technologies: website.data.technologies || [],
-    services: website.data.services || [],
-    hasFreeTier: website.data.hasFreeTier || false,
-    hasPaidPlan: website.data.hasPaidPlan || false,
-    monthlyPrice: website.data.monthlyPrice || 0,
-    currency: website.data.currency || 'USD',
-    rating: website.data.rating || 0
-  }))
+    tags: website.data.tags || []
+  }) as Resource)
 ];
 
 // Sort combined resources by date
@@ -204,9 +168,7 @@ let filteredResources = allResources.sort((a, b) => b.pubDate.valueOf() - a.pubD
 
 // Filter by content type
 if (contentType && contentType !== 'all') {
-  filteredResources = filteredResources.filter(resource =>
-    resource.type === contentType
-  );
+  filteredResources = filteredResources.filter(resource => resource.type === contentType);
 }
 
 // Filter by tag/category
@@ -231,9 +193,10 @@ if (limit && !tag) {
 // Get all unique tags/categories from all resources
 const allTagsSet = new Set<string>();
 filteredResources.forEach(resource => {
-  if (resource.type === 'blog' && resource.tags) {
+  if (resource.tags && Array.isArray(resource.tags)) {
     resource.tags.forEach(tag => allTagsSet.add(tag));
-  } else if (resource.categories) {
+  }
+  if (resource.categories && Array.isArray(resource.categories)) {
     resource.categories.forEach(category => allTagsSet.add(category));
   }
 });
@@ -262,9 +225,9 @@ const totalResources = filteredResources.length;
         <h3>Debug Information</h3>
         <ul>
           <li>Blog collection: {blogCount} items</li>
-          <li>Product collection: {productCount} items</li>
-          <li>App collection: {appCount} items</li>
-          <li>Website collection: {websiteCount} items</li>
+          <li>Products: {productCount} items</li>
+          <li>Apps: {appCount} items</li>
+          <li>Websites: {websiteCount} items</li>
           <li>Total resources loaded: {totalResources}</li>
           <li>Blog Posts: {categoryCounts.blog}</li>
           <li>Products: {categoryCounts.product}</li>
@@ -322,7 +285,7 @@ const totalResources = filteredResources.length;
     <div class="resources-grid" id="resources-container">
       {filteredResources.length > 0 ? (
         filteredResources.map((resource) => {
-          // Base props for all content types
+          // Base props for all content types, with image removed
           const baseProps = {
             title: resource.title,
             link: `/${resource.type}/${resource.slug}`,
@@ -331,7 +294,7 @@ const totalResources = filteredResources.length;
             isSponsored: resource.isSponsored,
             pubDate: resource.pubDate.toISOString(),
             updatedDate: resource.updatedDate?.toISOString(),
-            image: resource.image,
+            image: '', // No image
           };
           
           // Add specific props based on content type
@@ -381,7 +344,7 @@ const totalResources = filteredResources.length;
           }
           
           // Merge the base props with specific props
-          const props = {...baseProps, ...specificProps};
+          const props = { ...baseProps, ...specificProps };
           
           return (
             <ItemCard {...props} />
@@ -430,13 +393,12 @@ const totalResources = filteredResources.length;
     margin: 0 auto var(--spacing-lg);
   }
   .container {
-  position: relative;
-  padding-top: 3rem;
-}
+    position: relative;
+    padding-top: 3rem;
+  }
 
   .filter-container {
     margin-bottom: var(--spacing-lg);
-    
   }
   
   .search-box {
@@ -638,7 +600,7 @@ const totalResources = filteredResources.length;
     transition: all 0.3s ease-in-out;
   }
   /* Add these styles to your existing <style> block */
-    .pagination-container {
+  .pagination-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -917,7 +879,7 @@ const totalResources = filteredResources.length;
         // Check search match
         const searchMatch = searchTerm === '' || 
                            title.toLowerCase().includes(searchTerm) || 
-                           description?.includes(searchTerm) || 
+                           description.includes(searchTerm) || 
                            tags.some(tag => tag.includes(searchTerm));
         
         // Apply combined filtering
@@ -949,4 +911,4 @@ const totalResources = filteredResources.length;
     console.log("Initializing resource filtering...");
     filterResources();
   });
-  </script>
+</script>

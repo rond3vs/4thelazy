@@ -1,25 +1,13 @@
 ---
-title: "FocusFlow"
-description: "A minimalist productivity app that helps you stay focused using the Pomodoro technique."
-pubDate: 2025-01-20
-updatedDate: 2025-03-10
-image: "/images/focusflow.png"
-categories:
-  - productivity
-  - time management
-platform:
-  - iOS
-  - Android
-  - Web
-price: 4.99
-currency: "USD"
-isFreemium: true
-hasSubscription: true
-version: "2.3.1"
-developer: "Zenware Studios"
-rating: 4.7
-downloadLink: "https://focusflow.app/download"
+title: "Chuck Email"
+description: "A comprehensive contract template designed for freelancers to establish clear terms with clients."
+pubDate: 2024-03-20
 isSponsored: false
+tags:
+  - "Tech"
+  - "Productivity"
+affiliateLink: "/apps/chuck-email"
+platform: ["Web"]
 ---
 
 ## Summary

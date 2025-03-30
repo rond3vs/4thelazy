@@ -1,27 +1,12 @@
 ---
 title: "Freelance Contract Template"
 description: "A comprehensive contract template designed for freelancers to establish clear terms with clients."
+type: "product"
+tags: ["tech", "productivity"]
 pubDate: 2024-03-20
-image: "/images/products/contract-template.jpg"
-categories: ["Money"]
-isSponsored: false
-type: "Product"
-productType: "App"
-affiliateLink: "https://4thelazy.com/products/freelance-contract-template"
+affiliateLink: "https://amzn.to/4hS8hRC"
 ---
 
-## What's Included
+### Freelance Contract Template
 
-- Comprehensive terms and conditions
-- Payment schedule templates
-- Intellectual property clauses
-- Termination conditions
-- Dispute resolution procedures
-
-## How to Use
-
-Simply download the template, customize the highlighted sections with your specific details, and send to your client for review and signature.
-
-## Legal Disclaimer
-
-This template is provided for informational purposes only and does not constitute legal advice. We recommend having any contract reviewed by a qualified legal professional before use.
+A comprehensive contract template designed for freelancers to establish clear terms with clients.

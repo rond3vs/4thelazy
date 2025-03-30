@@ -5,21 +5,7 @@ pubDate: 2024-12-01
 updatedDate: 2025-01-15
 image: "/images/supertool.png"
 url: "https://supertool.io"
-categories:
-  - productivity
-  - collaboration
-technologies:
-  - React
-  - Node.js
-services:
-  - Task Management
-  - File Sharing
-hasFreeTier: true
-hasPaidPlan: true
-monthlyPrice: 9.99
-currency: "USD"
-rating: 4.5
-isSponsored: false
+tags: ["productivity", "collaboration"]
 ---
 
 ## Summary

@@ -1,73 +1,46 @@
 // src/content/config.ts
 import { defineCollection, z } from 'astro:content';
 
+// Common fields for all collections
+const baseSchema = {
+  title: z.string(),
+  description: z.string().optional(),
+  pubDate: z.date(),
+  updatedDate: z.date().optional(),
+  image: z.string().optional(),
+  isSponsored: z.boolean().default(false),
+};
+
 const blogCollection = defineCollection({
   schema: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    pubDate: z.date(),
-    updatedDate: z.date().optional(),
-    image: z.string().optional(),
+    ...baseSchema,
     tags: z.array(z.string()),
-    type: z.string(),
-    isSponsored: z.boolean().default(false),
+    type: z.string(), // additional blog-specific field
   }),
 });
 
 const productsCollection = defineCollection({
   schema: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    pubDate: z.date(), 
-    updatedDate: z.date().optional(),
-    image: z.string().optional(),
-    categories: z.array(z.string()),
+    ...baseSchema,
+    tags: z.array(z.string()),
     affiliateLink: z.string(),
-    price: z.number().optional(),
-    currency: z.string().default('USD'),
-    rating: z.number().optional(),
-    isSponsored: z.boolean().default(false),
   }),
 });
 
 const appsCollection = defineCollection({
   schema: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    pubDate: z.date(),
-    updatedDate: z.date().optional(),
-    image: z.string().optional(),
-    categories: z.array(z.string()),
+    ...baseSchema,
     platform: z.array(z.enum(['iOS', 'Android', 'Web', 'macOS', 'Windows', 'Linux'])),
-    price: z.number().optional(),
-    currency: z.string().default('USD'),
-    isFreemium: z.boolean().default(false),
-    hasSubscription: z.boolean().default(false),
-    version: z.string().optional(),
-    developer: z.string().optional(),
-    rating: z.number().optional(),
     downloadLink: z.string().optional(),
-    isSponsored: z.boolean().default(false),
+    tags: z.array(z.string()),
   }),
 });
 
 const websitesCollection = defineCollection({
   schema: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    pubDate: z.date(),
-    updatedDate: z.date().optional(),
-    image: z.string().optional(),
+    ...baseSchema,
     url: z.string().url(),
-    categories: z.array(z.string()),
-    technologies: z.array(z.string()).optional(),
-    services: z.array(z.string()).optional(),
-    hasFreeTier: z.boolean().default(false),
-    hasPaidPlan: z.boolean().default(false),
-    monthlyPrice: z.number().optional(),
-    currency: z.string().default('USD'),
-    rating: z.number().optional(),
-    isSponsored: z.boolean().default(false),
+    tags: z.array(z.string()),
   }),
 });
 
