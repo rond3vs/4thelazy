@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Why Are You Lazy?"
 description: "A draft post still in progress."
 pubDate: 2022-01-24

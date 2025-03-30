@@ -32,6 +32,7 @@ interface Resource {
   currency?: string;          // For products, apps, websites
   rating?: number;            // For products, apps, websites
   affiliateLink?: string;     // For products
+  draft?: boolean;            // For blog
   
   // App-specific fields
   platform?: string[];
@@ -59,10 +60,10 @@ const {
 } = Astro.props;
 
 // Get all collections and filter out drafts (assuming missing pubDate means a draft)
-const allBlogPosts = (await getCollection('blog')).filter(post => !!post.data.pubDate);
-const allProducts = (await getCollection('products')).filter(product => !!product.data.pubDate);
-const allApps = (await getCollection('apps')).filter(app => !!app.data.pubDate);
-const allWebsites = (await getCollection('websites')).filter(website => !!website.data.pubDate);
+const allBlogPosts = await getCollection('blog', ({ data }) => !data.draft);
+const allProducts = await getCollection('products', ({ data }) => !data.draft);
+const allApps = await getCollection('apps', ({ data }) => !data.draft);
+const allWebsites = await getCollection('websites', ({ data }) => !data.draft);
 
 // Collection counts for debugging
 const blogCount = allBlogPosts.length;
@@ -122,7 +123,8 @@ allResources = [
     image: '',
     pubDate: product.data.pubDate || new Date(),
     updatedDate: product.data.updatedDate,
-    affiliateLink: product.data.affiliateLink || ''
+    affiliateLink: product.data.affiliateLink || '',
+    tags: product.data.tags || []
   }) as Resource)
 ];
 
@@ -173,14 +175,11 @@ if (contentType && contentType !== 'all') {
 
 // Filter by tag/category
 if (tag && tag !== 'all') {
-  filteredResources = filteredResources.filter(resource => {
-    if (resource.type === 'blog' && resource.tags) {
-      return resource.tags.includes(tag);
-    } else if (resource.categories) {
-      return resource.categories.includes(tag);
-    }
-    return false;
-  });
+  const lowerTag = tag.toLowerCase();
+  filteredResources = filteredResources.filter(resource =>
+    Array.isArray(resource.tags) &&
+    resource.tags.map(t => t.toLowerCase()).includes(lowerTag)
+  );
 }
 
 // Apply limit
@@ -192,7 +191,7 @@ if (limit && !tag) {
 
 // Get all unique tags/categories from all resources
 const allTagsSet = new Set<string>();
-filteredResources.forEach(resource => {
+allResources.forEach(resource => {
   if (resource.tags && Array.isArray(resource.tags)) {
     resource.tags.forEach(tag => allTagsSet.add(tag));
   }
@@ -308,6 +307,7 @@ const totalResources = filteredResources.length;
           } 
           else if (resource.type === 'product') {
             specificProps = {
+              tags: resource.tags || [],
               categories: resource.categories || [],
               price: resource.price || 0,
               currency: resource.currency || 'USD',
@@ -317,6 +317,7 @@ const totalResources = filteredResources.length;
           }
           else if (resource.type === 'app') {
             specificProps = {
+              tags: resource.tags || [],
               categories: resource.categories || [],
               platform: resource.platform || [],
               price: resource.price || 0,
@@ -331,6 +332,7 @@ const totalResources = filteredResources.length;
           }
           else if (resource.type === 'website') {
             specificProps = {
+              tags: resource.tags || [],
               categories: resource.categories || [],
               url: resource.url || '',
               technologies: resource.technologies || [],

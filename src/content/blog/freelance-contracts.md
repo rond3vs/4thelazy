@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Digital Minimalism: How I Reclaimed 3 Hours Per Day By Deleting Almost Everything"
 description: "The counterintuitive path to digital productivity isn't more apps—it's fewer."
 pubDate: 2025-03-15

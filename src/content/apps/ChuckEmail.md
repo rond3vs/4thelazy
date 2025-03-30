@@ -4,10 +4,13 @@ description: "A comprehensive contract template designed for freelancers to esta
 pubDate: 2024-03-20
 isSponsored: false
 tags:
-  - "Tech"
+  - "Email"
   - "Productivity"
+  - "Tech"
+
 affiliateLink: "/apps/chuck-email"
 platform: ["Web"]
+contentType: "app"
 ---
 
 ## Summary

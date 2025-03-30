@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Best Standing Desk Exercises"
 description: "A helpful post from 4thelazy.com."
 pubDate: 2023-05-16

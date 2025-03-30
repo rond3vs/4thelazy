@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Best Aunt Jemima Pancake Recipe - For One Person"
 description: "The Aunt Jemima pancake recipe scaled for one person—perfectly fluffy and simple."
 pubDate: 2022-09-11

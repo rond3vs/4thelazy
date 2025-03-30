@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Easy Way to Clean Bird Poop off Your Car Window"
 description: "A helpful post from 4thelazy.com."
 pubDate: 2024-04-03

@@ -5,7 +5,7 @@ pubDate: 2024-12-01
 updatedDate: 2025-01-15
 image: "/images/supertool.png"
 url: "https://supertool.io"
-tags: ["productivity", "collaboration"]
+tags: ["Productivity", "Email"]
 ---
 
 ## Summary

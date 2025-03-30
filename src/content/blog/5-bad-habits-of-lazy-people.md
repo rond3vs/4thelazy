@@ -5,6 +5,7 @@ pubDate: 2021-03-28
 image: "/images/blog/default.jpg"
 tags: ["Productivity"]
 type: "blog"
+draft: false
 ---
 
 We've all been there. I had a routine and a to-do list for the day, but then laziness got in the way.

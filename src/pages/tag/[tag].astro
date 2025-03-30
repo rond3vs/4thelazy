@@ -5,14 +5,23 @@ import MainLayout from '../../layouts/MainLayout.astro';
 import ItemGrid from '../../components/ItemGrid.astro';
 
 export async function getStaticPaths() {
-  const allPosts = await getCollection('blog');
-  
-  // Get all unique tags
-  const uniqueTags = [...new Set(allPosts.map((post: CollectionEntry<'blog'>) => post.data.tags).flat())] as string[];
-  
-  // Create a path for each tag
+  const blog = await getCollection('blog');
+  const products = await getCollection('products');
+  const apps = await getCollection('apps');
+  const websites = await getCollection('websites');
+
+  const allTags = [
+    ...blog.flatMap((entry) => entry.data.tags || []),
+    ...products.flatMap((entry) => entry.data.tags || []),
+    ...apps.flatMap((entry) => entry.data.tags || []),
+    ...websites.flatMap((entry) => entry.data.tags || []),
+  ];
+
+  const uniqueTags = [...new Set(allTags)];
+
   return uniqueTags.map((tag: string) => ({
     params: { tag: tag.toLowerCase() },
+    
     props: { tag },
   }));
 }
@@ -22,7 +31,7 @@ interface Props {
   tag: string;
 }
 
-const { tag } = Astro.props as Props;
+const tag = (Astro.props.tag as string).toLowerCase();
 ---
 
 <MainLayout>
@@ -32,8 +41,7 @@ const { tag } = Astro.props as Props;
       <a href="/" class="back-link">← Back to all resources</a>
     </div>
   </div>
-  
-  <ItemGrid tag={tag} />
+  <ItemGrid tag={tag} contentType="all" />
 </MainLayout>
 
 <style>

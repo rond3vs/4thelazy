@@ -5,6 +5,7 @@ pubDate: 2022-01-08
 image: "/images/blog/default.jpg"
 tags: ["Tech", "Productivity"]
 type: "blog"
+draft: true
 ---
 
 If you aren’t using shortcuts, then you are using your iPhone wrong. Simple as that. They can be a iPhone user’s best friend. There’s so much untapped potential with shortcuts.

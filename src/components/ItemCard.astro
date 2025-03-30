@@ -9,6 +9,7 @@ interface BaseProps {
   pubDate?: string;
   updatedDate?: string;
   type?: string;
+  draft?: boolean;
 }
 
 interface BlogProps extends BaseProps {
@@ -18,13 +19,12 @@ interface BlogProps extends BaseProps {
 
 interface ProductProps extends BaseProps {
   contentType: 'product';
-  categories?: string[];
+  tags?: string[];
   affiliateLink?: string;
 }
 
 interface AppProps extends BaseProps {
   contentType: 'app';
-  categories?: string[];
   platform?: string[];
   downloadLink?: string;
   tags?: string[];
@@ -32,7 +32,6 @@ interface AppProps extends BaseProps {
 
 interface WebsiteProps extends BaseProps {
   contentType: 'website';
-  categories?: string[];
   url?: string;
   tags?: string[];
 }
@@ -50,39 +49,45 @@ const {
   isSponsored = false,
   pubDate,
   type,
+  draft = false,
 } = props;
 
-if (!pubDate) return;
+if (!pubDate || draft) return;
 
-const getTags = (): string[] => {
-  if (contentType === 'blog') return props.tags ?? [];
-  return (props as any).categories ?? [];
-};
-const tags = getTags();
+// Tags/Categories fallback
+const tags = (Array.isArray(props.tags) ? props.tags
+           : Array.isArray((props as any).categories) ? (props as any).categories
+           : []) as string[];
 
-const isAffiliate = contentType === 'product' && !!props.affiliateLink;
-const isExternal =
-  (contentType === 'product' && isAffiliate) ||
-  (contentType === 'app' && !!props.downloadLink) ||
-  (contentType === 'website' && !!props.url);
-
-const getHref = () => {
-  if (contentType === 'product' && props.affiliateLink) return props.affiliateLink;
-  if (contentType === 'app' && props.downloadLink) return props.downloadLink;
-  if (contentType === 'website' && props.url) return props.url;
-  return link;
-};
-
-const getContentEmoji = () => {
+// External URL logic
+const isExternal = (() => {
   switch (contentType) {
-    case 'blog': return '📝 Blog';
-    case 'product': return '🛍️ Product';
-    case 'app': return '📱 App';
-    case 'website': return '🌐 Website';
-    default: return '';
+    case 'product': return !!(props as ProductProps).affiliateLink;
+    case 'app': return !!(props as AppProps).downloadLink;
+    case 'website': return !!(props as WebsiteProps).url;
+    default: return false;
   }
-};
-const contentEmojiLabel = getContentEmoji();
+})();
+
+const href = (() => {
+  if (contentType === 'product' && (props as ProductProps).affiliateLink) {
+    return (props as ProductProps).affiliateLink!;
+  }
+  if (contentType === 'app' && (props as AppProps).downloadLink) {
+    return (props as AppProps).downloadLink!;
+  }
+  if (contentType === 'website' && (props as WebsiteProps).url) {
+    return (props as WebsiteProps).url!;
+  }
+  return link;
+})();
+
+const contentEmojiLabel = {
+  blog: '📝 Blog',
+  product: '🛍️ Product',
+  app: '📱 App',
+  website: '🌐 Website',
+}[contentType];
 ---
 
 <div 
@@ -92,21 +97,23 @@ const contentEmojiLabel = getContentEmoji();
   data-tags-lower={tags.map(t => t.toLowerCase()).join(',')}
   data-pub-date={pubDate}
 >
-  <a href={getHref()} class="card-link" target={isExternal ? "_blank" : "_self"} rel={isExternal ? "noopener noreferrer" : ""}>
+  <a href={href} class="card-link" target={isExternal ? "_blank" : "_self"} rel={isExternal ? "noopener noreferrer" : ""}>
     <div class="card-content">
       <div class="card-header">
-        {type && type.toLowerCase() !== contentType ? (
+        {type && type.toLowerCase() !== contentType && (
           <span class="badge custom-badge">{type}</span>
-        ) : null}
+        )}
         <span class="badge content-badge">{contentEmojiLabel}</span>
+        {isSponsored && <span class="badge sponsored-badge">Sponsored</span>}
       </div>
 
       <div class="card-body">
         <h3 class="card-title">{title}</h3>
         {description && <p class="card-description">{description}</p>}
+
         {tags.length > 0 && (
           <div class="card-tags">
-            {tags.slice(0, 2).map((tag: string) => (
+            {tags.slice(0, 2).map(tag => (
               <span class="card-tag">{tag}</span>
             ))}
           </div>
@@ -118,93 +125,47 @@ const contentEmojiLabel = getContentEmoji();
 
 <style>
   .resource-card.card {
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 0;
-  background: var(--color-white);
-  transition: box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0;
+    background: var(--color-white);
+    transition: box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 
-.resource-card.card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+  .resource-card.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
 
-.card-link {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+  .card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 
-.card-content {
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  flex: 1;
-}
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    flex: 1;
+  }
 
-.card-header {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
+  .card-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
 
-.card-body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.card-title {
-  font-size: 1.2rem;
-  margin: 0 0 8px;
-  font-weight: 600;
-}
-
-.card-description {
-  font-size: 0.95rem;
-  color: #555;
-  margin: 0 0 12px;
-  line-height: 1.4;
-}
-
-.card-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: auto; /* pushes tags to bottom of card */
-}
-
-.card-tag {
-  background: #eef;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
-.custom-badge {
-  background: #0c5460;
-  color: #fff;
-}
-
-.content-badge {
-  background: #206A5D;
-  color: #fff;
-}
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
 
   .card-title {
     font-size: 1.2rem;
@@ -220,10 +181,10 @@ const contentEmojiLabel = getContentEmoji();
   }
 
   .card-tags {
-    margin-top: auto;
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    margin-top: auto;
   }
 
   .card-tag {
@@ -234,5 +195,29 @@ const contentEmojiLabel = getContentEmoji();
     border-radius: 3px;
     font-size: 0.8rem;
     white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .custom-badge {
+    background: #0c5460;
+    color: #fff;
+  }
+
+  .content-badge {
+    background: #206A5D;
+    color: #fff;
+  }
+
+  .sponsored-badge {
+    background: #b91c1c;
+    color: #fff;
   }
 </style>

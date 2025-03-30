@@ -5,6 +5,7 @@ pubDate: 2025-03-26
 image: "/images/blog/default.jpg"
 tags: ["Health", "Job"]
 type: "blog"
+draft: true
 ---
 
 Back pain affects over 80% of adults at some point in their lives. Whether it's caused by injury, poor posture, or a chronic condition, back pain can make many jobs challenging or even impossible to perform.

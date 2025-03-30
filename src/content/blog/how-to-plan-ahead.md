@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Best Ways to Plan Ahead"
 description: "A draft post still in progress."
 pubDate: 2022-08-01

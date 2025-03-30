@@ -1,4 +1,5 @@
 ---
+draft: true
 title: "Don't Fall into the Trap of Productive Procrastination"
 description: "A pending post not yet published."
 pubDate: 2023-07-11
