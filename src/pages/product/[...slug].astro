@@ -27,9 +27,7 @@ const productLayoutProps = {
   publishDate: entry.data.pubDate, // Map pubDate to publishDate
   updatedDate: entry.data.updatedDate,
   image: entry.data.image,
-  categories: entry.data.categories,
-  description: entry.data.description,
-  productType: entry.data.productType || "Product", // Fallback if not present
+  description: entry.data.description, // Fallback if not present
   isRecommended: entry.data.isSponsored,
 };
 ---

@@ -1,5 +1,5 @@
 ---
-// SubmitPopup.astro with enhanced security
+// SubmitPopup.astro with enhanced styling and maintained security
 ---
 
 <div id="submitPopup" class="popup-overlay">
@@ -17,11 +17,13 @@
     </p>
     <form id="submitForm" class="popup-form">
       <div class="form-field">
-        <input type="url" id="resourceLink" name="Resource Link" placeholder="Resource link" required
+        <label for="resourceLink">Resource URL</label>
+        <input type="url" id="resourceLink" name="Resource Link" placeholder="https://example.com" required
                pattern="https?://.+" title="Please enter a valid URL starting with http:// or https://">
       </div>
       <div class="form-field">
-        <input type="email" id="emailAddress" name="Email Address" placeholder="Your email address" required>
+        <label for="emailAddress">Your Email</label>
+        <input type="email" id="emailAddress" name="Email Address" placeholder="you@example.com" required>
       </div>
       
       <!-- Honeypot field to catch bots -->
@@ -48,14 +50,50 @@
 </div>
 
 <style>
-  /* Styles from previous version - keeping them unchanged */
+  /* Base styles */
+  :root {
+    --color-primary: #206A5D;
+    --color-primary-dark: #174d43;
+    --color-primary-light: #e8f5f3;
+    --color-secondary: #f7b32b;
+    --color-white: #ffffff;
+    --color-gray-100: #f8f9fa;
+    --color-gray-200: #e9ecef;
+    --color-gray-300: #dee2e6;
+    --color-gray-400: #ced4da;
+    --color-gray-500: #adb5bd;
+    --color-gray-600: #6c757d;
+    --color-gray-700: #495057;
+    --color-gray-800: #343a40;
+    --color-gray-900: #212529;
+    --color-error: #dc3545;
+    --color-success: #28a745;
+    
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Popup overlay */
   .popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,31 +101,211 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(4px);
+    padding: 1rem;
+    box-sizing: border-box;
   }
 
-  /* Additional styles omitted for brevity - keep the styles from the previous version */
-  
-  /* New styles for captcha */
-  .captcha-field label {
-    display: block;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
+  .popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
   }
-  
-  /* Error and success styling */
+
+  /* Popup content container */
+  .popup-content {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 480px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: popup-fade-in 0.3s ease forwards;
+    position: relative;
+  }
+
+  @keyframes popup-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Popup header styling */
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-sm);
+  }
+
+  .popup-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+  }
+
+  .popup-description {
+    padding: 0 var(--spacing-lg);
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-gray-600);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  /* Close button styling */
+  .close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-gray-500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xs);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+
+  .close-btn:hover {
+    color: var(--color-gray-800);
+    background-color: var(--color-gray-200);
+  }
+
+  /* Form styling */
+  .popup-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .form-field label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+
+  .popup-form input[type="url"],
+  .popup-form input[type="email"],
+  .popup-form input[type="text"] {
+    padding: 0.75rem var(--spacing-md);
+    font-size: 1rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    background-color: var(--color-white);
+    color: var(--color-gray-800);
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .popup-form input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(32, 106, 93, 0.15);
+  }
+
+  .popup-form input::placeholder {
+    color: var(--color-gray-500);
+  }
+
+  /* Submit button styling */
+  .submit-btn {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    padding: 0.75rem var(--spacing-lg);
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .submit-btn:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .submit-btn:disabled {
+    background-color: var(--color-gray-400);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* CAPTCHA field styling */
+  .captcha-field {
+    background-color: var(--color-primary-light);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(32, 106, 93, 0.2);
+  }
+
+  .captcha-field label {
+    margin-bottom: var(--spacing-xs);
+  }
+
+  /* Form status message styling */
   .form-status {
-    font-family: var(--font-primary, 'Roboto Mono', sans-serif);
     font-size: 0.9rem;
-    padding: 0.5rem 0;
-    color: #206A5D;
+    padding: var(--spacing-xs) 0;
+    min-height: 1.5rem;
+    color: var(--color-primary);
+    font-weight: 500;
+    transition: all 0.2s ease;
   }
 
   .form-status.error {
-    color: #d32f2f;
+    color: var(--color-error);
   }
-  
+
   .form-status.success {
-    color: #388e3c;
+    color: var(--color-success);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .popup-content {
+      max-width: 100%;
+      border-radius: var(--radius-md);
+    }
+
+    .popup-header h2 {
+      font-size: 1.25rem;
+    }
+
+    .popup-form {
+      padding: var(--spacing-md);
+    }
+    
+    .popup-overlay {
+      padding: 0.5rem;
+    }
   }
 </style>
 
@@ -131,6 +349,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Close popup with escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && submitPopup.classList.contains('active')) {
+      submitPopup.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
   // Handle form submission
   submitForm.addEventListener('submit', async (e) => {
     e.preventDefault(); // Prevent default form submission
@@ -162,7 +388,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show loading state
     const submitBtn = submitForm.querySelector('.submit-btn');
     const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = 'Submitting...';
+    submitBtn.innerHTML = `
+      <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.25"/>
+        <path d="M12 2C6.47715 2 2 6.47715 2 12C2 12 2 14 4 14C6 14 6 12 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12C6 12 6 10 4 10C2 10 2 12 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor">
+          <animateTransform 
+            attributeName="transform" 
+            type="rotate"
+            from="0 12 12"
+            to="360 12 12"
+            dur="1s"
+            repeatCount="indefinite"/>
+        </path>
+      </svg>
+      Submitting...
+    `;
     submitBtn.disabled = true;
     formStatus.innerHTML = 'Sending your submission...';
     formStatus.className = 'form-status';
@@ -204,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       
       // Handle success - since we're using no-cors, we can't check response
-      formStatus.innerHTML = 'Resource submitted successfully!';
+      formStatus.innerHTML = '✅ Resource submitted successfully!';
       formStatus.className = 'form-status success';
       submitForm.reset();
       
@@ -215,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
     } catch (error) {
       console.error('Submission error:', error);
-      formStatus.innerHTML = error.message || 'There was an error with your submission. Please try again.';
+      formStatus.innerHTML = `❌ ${error.message || 'There was an error with your submission. Please try again.'}`;
       formStatus.className = 'form-status error';
     } finally {
       // Reset button state

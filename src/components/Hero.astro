@@ -5,139 +5,159 @@ import Newsletter from './Newsletter.astro';
 
 <section class="hero-section">
     <div class="container">
-      <span class="this-is">WELCOME TO:</span>
-      <h1 class="hero-title">4THELAZY.COM</h1>
-      
-      <p class="hero-description">
-        Scroll down to find tools and tips for lazy people like you 🫵 (and me). From fast food hacks to ways to be more productive.
-      </p>
-      
+      <div class="header-content">
+        <span class="this-is">WELCOME TO:</span>
+        <div class="title-container">
+          <h1 class="hero-title">4THELAZY.COM</h1>
+          <p class="tag">For when you don't feel like it.</p>
+        </div>
+      </div>
       <Newsletter />
+      <p class="hero-description">
+        Find tools and tips for lazy people like you 🫵 (and me). From fast food hacks to ways to be more productive.
+      </p>
+      <div class="scroll-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </div>
     </div>
   </section>
   
   <style>
-    .hero-section {
-      padding: clamp(3rem, 10vh, 6rem) 0;
-    min-height: clamp(300px, 100vh, 600px);
-   display: flex;
-   align-items: center;
-      
-      margin-bottom: 2rem;
-    }
-  
-    .container {
-      margin: 0 auto;
-      text-align: center;
-      margin-top: 2rem;
-      
-    }
-    
-    .this-is {
-      font-size: 1.2rem;
-      color: var(--color-primary);
-      margin-bottom: 1rem;
-      border-bottom: 1px solid #d1d5db;
-      display: inline-block;
-      padding-bottom: 0.5rem;
-    }
-  
+   .hero-section {
+  min-height: clamp(300px, 100vh, 600px);
+  display: flex;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.container {
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 2rem;
+  position: relative;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.this-is {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #d1d5db;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Title container to group title and tag for the underline */
+.title-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 4rem;
+}
+
 .hero-title {
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      
+  font-size: clamp(1.8rem, 8vw, 5rem);
   color: var(--color-primary);
   font-family: 'Bungee Shade', var(--font-sans);
- 
+  position: relative;
+  animation: titleEntrance 1.5s ease-out forwards;
+  opacity: 0;
+  margin-bottom: 0.5rem; /* Reduce space between title and tag */
 }
-  
-    .hero-description {
-      font-size: clamp(1.25rem, 2vw, 1.5rem);
-      color: var(--color-text);
-      margin-bottom: 2rem;
-      line-height: 1.5;
-      max-width: 800px;
-      margin: 35px auto;
-    }
-  
-    .newsletter-container {
-      max-width: 32rem;
-      margin: 0 auto;
-      text-align: center;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 1rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-  
-    .newsletter-header {
-      margin-bottom: 1rem;
-    }
 
-  
-    .newsletter-form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-  
-    .input-container {
-      flex-grow: 1;
-    }
-  
-    .email-input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-  
-    .email-input:focus {
-      outline: none;
-      border-color: #2c6661;
-      box-shadow: 0 0 0 3px rgba(44, 102, 97, 0.2);
-    }
-  
-    .subscribe-button {
-      background-color: #2c6661;
-      color: white;
-      font-weight: 500;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.15s ease-in-out;
-    }
-  
-    .subscribe-button:hover {
-      background-color: #1e4e4a;
-    }
-  
-    .arrow-icon {
-      margin-left: 0.5rem;
-      fill: currentColor;
-    }
-  
-    .newsletter-description {
-      font-size: 0.875rem;
-      color: #6b7280;
-      margin-top: 0.75rem;
-    }
-  
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
-    }
+.tag {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.8s forwards;
+}
+
+.hero-description {
+  color: var(--color-text);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+  max-width: min(700px, 100%);
+  margin: 35px auto;
+  width: fit-content;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 1.5s forwards;
+}
+
+.scroll-arrow {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 2s infinite;
+  cursor: pointer;
+  color: var(--color-primary);
+}
+
+/* Animations */
+@keyframes titleEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    letter-spacing: -5px;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(10px) scale(1.05);
+    letter-spacing: 2px;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: normal;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) translateX(-50%);
+  }
+  40% {
+    transform: translateY(-20px) translateX(-50%);
+  }
+  60% {
+    transform: translateY(-10px) translateX(-50%);
+  }
+}
+
+/* Move the underline to the title-container instead of hero-title */
+.title-container::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; /* Position below both title AND tag */
+  left: 25%;
+  width: 0%;
+  height: 3px;
+  background: var(--color-primary);
+  animation: underline 1s ease-out 1.8s forwards;
+}
+
+@keyframes underline {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 50%;
+  }
+}
   </style>
+

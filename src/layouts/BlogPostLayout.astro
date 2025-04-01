@@ -2,6 +2,7 @@
 // src/layouts/BlogPostLayout.astro
 import MainLayout from './MainLayout.astro';
 import { formatDate } from '../utils/formatDate';
+import Newsletter from '../components/Newsletter.astro';
 
 interface Props {
   title: string;
@@ -64,6 +65,7 @@ const {
       
       <div class="post-content">
         <slot />
+        <Newsletter />
       </div>
     </div>
   </article>

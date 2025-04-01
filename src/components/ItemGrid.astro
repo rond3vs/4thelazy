@@ -216,7 +216,7 @@ const totalResources = filteredResources.length;
 
 <section class="resources-section">
   <div class="container">
-    <h2 class="section-title">Look around. Stay Awhile. 🤩</h2>
+    <h2 class="section-title">Look around. Stay Awhile.</h2>
     <p class="section-description">Explore our latest articles and tools to help you stay informed and productive.</p>
     
     {debug && (
@@ -809,45 +809,45 @@ const totalResources = filteredResources.length;
       // Update pagination controls
       createPagination(filteredCards.length);
       
-      // Scroll to top of resources container
-      resourcesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
-    // Shuffle function to randomize visible cards
     function shuffleVisibleCards() {
-      // Shuffle the filtered cards array
-      for (let i = filteredCards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        // Mark as shuffled to add animation
-        filteredCards[i].classList.add('shuffled');
-        filteredCards[j].classList.add('shuffled');
-        // Swap elements
-        [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
-      }
-      
-      // Add shuffled status to debug
-      isShuffled = true;
-      
-      // Reset to page 1 after shuffling
-      currentPage = 1;
-      
-      // Update display
-      updatePageDisplay();
-      
-      // Add animation effect
-      setTimeout(() => {
-        filteredCards.forEach(card => {
-          card.classList.remove('shuffled');
-          card.classList.add('shuffle-complete');
-        });
-        
-        setTimeout(() => {
-          filteredCards.forEach(card => {
-            card.classList.remove('shuffle-complete');
-          });
-        }, 300);
-      }, 10);
-    }
+  // Fisher-Yates shuffle
+  for (let i = filteredCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+  }
+
+  // Clear current DOM
+  resourcesContainer.innerHTML = '';
+
+  // Append shuffled cards in new order
+  filteredCards.forEach(card => {
+    resourcesContainer.appendChild(card);
+  });
+
+  // Animate
+  filteredCards.forEach(card => {
+    card.classList.add('shuffled');
+  });
+
+  setTimeout(() => {
+    filteredCards.forEach(card => {
+      card.classList.remove('shuffled');
+      card.classList.add('shuffle-complete');
+    });
+
+    setTimeout(() => {
+      filteredCards.forEach(card => {
+        card.classList.remove('shuffle-complete');
+      });
+    }, 300);
+  }, 10);
+
+  // Reset to page 1 and update pagination
+  currentPage = 1;
+  updatePageDisplay();
+}
     
     // Enhanced filtering function
     function filterResources() {

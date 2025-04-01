@@ -9,7 +9,6 @@ interface Props {
   updatedDate?: Date;
   image?: string;
   categories?: string[];
-  productType: string;
   isRecommended?: boolean;
   description?: string;
   affiliateUrl?: string;
@@ -21,7 +20,6 @@ const {
   updatedDate, 
   image, 
   categories, 
-  productType, 
   isRecommended,
   description,
   affiliateUrl
@@ -35,7 +33,6 @@ const {
       
       <header class="review-header">
         <div class="product-meta">
-          <span class="product-type">{productType}</span>
           {publishDate && <time datetime={publishDate instanceof Date ? publishDate.toISOString() : ''}>{formatDate(publishDate)}</time>}
           {updatedDate && (
             <span class="updated-date">
