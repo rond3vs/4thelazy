@@ -6,10 +6,9 @@ import Newsletter from './Newsletter.astro';
 <section class="hero-section">
     <div class="container">
       <div class="header-content">
-        <span class="this-is">WELCOME TO:</span>
         <div class="title-container">
           <h1 class="hero-title">4THELAZY.COM</h1>
-          <p class="tag">For when you don't feel like it.</p>
+          <p class="tag">4 when you don't feel like it</p>
         </div>
       </div>
       <Newsletter />
@@ -35,7 +34,7 @@ import Newsletter from './Newsletter.astro';
 .container {
   margin: 0 auto;
   text-align: center;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   position: relative;
 }
 
@@ -47,7 +46,7 @@ import Newsletter from './Newsletter.astro';
 }
 
 .this-is {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--color-primary);
   margin-bottom: 1rem;
   border-bottom: 1px solid #d1d5db;
@@ -61,11 +60,11 @@ import Newsletter from './Newsletter.astro';
 .title-container {
   position: relative;
   display: inline-block;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 }
 
 .hero-title {
-  font-size: clamp(1.8rem, 8vw, 5rem);
+  font-size: clamp(2.5rem, 8vw, 5rem);
   color: var(--color-primary);
   font-family: 'Bungee Shade', var(--font-sans);
   position: relative;
@@ -75,7 +74,6 @@ import Newsletter from './Newsletter.astro';
 }
 
 .tag {
-  font-size: 1.3rem;
   margin-bottom: 1rem;
   color: var(--color-text);
   opacity: 0;
@@ -139,17 +137,7 @@ import Newsletter from './Newsletter.astro';
   }
 }
 
-/* Move the underline to the title-container instead of hero-title */
-.title-container::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; /* Position below both title AND tag */
-  left: 25%;
-  width: 0%;
-  height: 3px;
-  background: var(--color-primary);
-  animation: underline 1s ease-out 1.8s forwards;
-}
+
 
 @keyframes underline {
   0% {

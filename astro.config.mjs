@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   output: 'static', // Changed from 'server' to 'static'
-  site: 'https://rond3vs.github.io',
+  site: 'https://4thelazy.com/',
   build: {
     assets: 'assets',
     inlineStylesheets: 'auto',

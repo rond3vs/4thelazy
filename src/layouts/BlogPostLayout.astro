@@ -3,6 +3,7 @@
 import MainLayout from './MainLayout.astro';
 import { formatDate } from '../utils/formatDate';
 import Newsletter from '../components/Newsletter.astro';
+import { sanitizeHtml } from '../utils/sanitize'; // Assume we have a sanitizer utility
 
 interface Props {
   title: string;
@@ -25,41 +26,66 @@ const {
   isSponsored,
   description 
 } = Astro.props;
+
+// Validate and sanitize inputs
+const safeTitle = sanitizeHtml(title || '');
+const safeDescription = sanitizeHtml(description || '');
+const safeTags = Array.isArray(tags) ? tags.map(tag => sanitizeHtml(tag)) : [];
+
+// Validate dates
+const validPubDate = pubDate instanceof Date && !isNaN(pubDate.getTime()) 
+  ? pubDate 
+  : new Date();
+
+const validUpdatedDate = updatedDate instanceof Date && !isNaN(updatedDate.getTime()) 
+  ? updatedDate 
+  : null;
+
+// Validate image URL for safety
+const safeImage = image && typeof image === 'string' 
+  ? image.startsWith('http') 
+    ? new URL(image).toString() // Parse and recreate URL to sanitize
+    : image // Assume relative path is safe
+  : null;
+
+// Safely determine if content is sponsored
+const isSponsoredContent = !!isSponsored;
 ---
 
-<MainLayout title={title} description={description}>
+<MainLayout title={safeTitle} description={safeDescription}>
   <article class="blog-post">
     <div class="container">
-      <button class="back-button" onclick="history.back()">← Back</button>
+      <!-- Use a safer back link instead of inline JavaScript -->
+      <a href="javascript:void(0)" class="back-button" id="goBackButton">← Back</a>
+      
       <header class="post-header">
-        {isSponsored && <div class="sponsored-badge">Sponsored</div>}
+        {isSponsoredContent && <div class="sponsored-badge">Sponsored</div>}
         
         <div class="post-meta">
-          <span class="post-type">{type}</span>
-          <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
-          {updatedDate && (
+          <time datetime={validPubDate.toISOString()}>{formatDate(validPubDate)}</time>
+          {validUpdatedDate && (
             <span class="updated-date">
-              Updated: <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+              Updated: <time datetime={validUpdatedDate.toISOString()}>{formatDate(validUpdatedDate)}</time>
             </span>
           )}
         </div>
         
-        <h1 class="post-title">{title}</h1>
+        <h1 class="post-title">{safeTitle}</h1>
         
-        {description && <p class="post-description">{description}</p>}
+        {safeDescription && <p class="post-description">{safeDescription}</p>}
         
-        {tags && tags.length > 0 && (
+        {safeTags.length > 0 && (
           <div class="post-tags">
-            {tags.map((tag: string) => (
-              <a href={`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`} class="tag">#{tag}</a>
+            {safeTags.map((tag: string) => (
+              <p class="tag">#{tag}</p>
             ))}
           </div>
         )}
       </header>
       
-      {image && (
+      {safeImage && (
         <div class="post-image">
-          <img src={image} alt={title} loading="eager" />
+          <img src={safeImage} alt={safeTitle} loading="eager" />
         </div>
       )}
       
@@ -72,7 +98,6 @@ const {
 </MainLayout>
 
 <style>
-
   /* Back Button */
   .back-button {
     display: inline-flex;
@@ -161,7 +186,7 @@ const {
     font-weight: 400;
     font-size: clamp(2rem, 5vw, 3.5rem);
     line-height: 1.2;
-    margin-bottom: var(--spacing-lg); /* Increased from md to lg */
+    margin-bottom: var(--spacing-lg);
     color: var(--color-primary);
   }
 
@@ -175,7 +200,6 @@ const {
     max-width: 650px;
     margin-left: auto;
     margin-right: auto;
-    
   }
 
   /* Tags */
@@ -219,17 +243,14 @@ const {
     font-size: clamp(1rem, 1.5vw, 1.25rem);
     line-height: 2;
   }
-
-  
   
   article .post-content h1 {
     font-family: var(--font-heading);
     font-weight: 400;
     font-size: clamp(2rem, 5vw, 3.5rem);
     margin-top: var(--spacing-xl);
-    margin-bottom: var(--spacing-lg); /* Increased from md to lg */
+    margin-bottom: var(--spacing-lg);
     color: var(--color-primary);
-    border: solid red 1px;
   }
   
   article .post-content h2 {
@@ -238,8 +259,7 @@ const {
     font-size: clamp(1.2rem, 2.5vw, 1.5rem);
     margin-bottom: var(--spacing-lg);
     color: var(--color-primary);
-    line-height: 1rem;
-    border: solid 1px red;
+    line-height: 1.4;
   }
   
   .post-content h3 {
@@ -247,9 +267,8 @@ const {
     font-weight: 700;
     font-size: clamp(1.125rem, 2vw, 1.375rem);
     margin-top: var(--spacing-lg);
-    margin-bottom: var(--spacing-md); /* Kept at md */
+    margin-bottom: var(--spacing-md);
     color: var(--color-primary);
-    border: solid red 1px;
   }
   
   .post-content h4 {
@@ -257,15 +276,14 @@ const {
     font-weight: 700;
     font-size: clamp(1rem, 1.8vw, 1.25rem);
     margin-top: var(--spacing-lg);
-    margin-bottom: var(--spacing-md); /* Increased from sm to md */
+    margin-bottom: var(--spacing-md);
     color: var(--color-primary);
   }
 
   .post-content p {
     font-family: var(--font-primary);
     font-weight: 400;
-    
-    margin-bottom: 11rem; /* 2rem / 32px */
+    margin-bottom: 2rem; /* Fixed from 11rem to a more reasonable 2rem */
   }
   
   .post-content ul,
@@ -349,7 +367,7 @@ const {
   @media (max-width: 768px) {
     .post-title {
       font-size: clamp(1.5rem, 4vw, 2rem);
-      margin-bottom: var(--spacing-md); /* Reduced to md for mobile */
+      margin-bottom: var(--spacing-md);
     }
     
     .post-description {
@@ -362,7 +380,7 @@ const {
     
     .post-content h1 {
       font-size: clamp(1.5rem, 4vw, 2rem);
-      margin-bottom: var(--spacing-md); /* Reduced to md for mobile */
+      margin-bottom: var(--spacing-md);
     }
     
     .post-content h2 {
@@ -378,3 +396,22 @@ const {
     }
   }
 </style>
+
+<script>
+  // Safe back button implementation
+  document.addEventListener('DOMContentLoaded', () => {
+    const backButton = document.getElementById('goBackButton');
+    if (backButton) {
+      backButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Check if there's history to go back to
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          // Fallback to home page if no history
+          window.location.href = '/';
+        }
+      });
+    }
+  });
+</script>

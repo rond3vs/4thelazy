@@ -272,7 +272,7 @@ const totalResources = filteredResources.length;
       <div class="tags-filter">
         <h3 class="filter-title">Filter by tags</h3>
         <div class="filter-tabs" id="tag-filters">
-          <button class="filter-tab active" data-tag="all">ALL</button>
+          <button class="filter-tab active" data-tag="all">All</button>
           {allTags.map((tagName) => (
             <button class="filter-tab" data-tag={tagName}>{tagName}</button>
           ))}
@@ -420,6 +420,7 @@ const totalResources = filteredResources.length;
   .search-box input {
     padding-left: 40px;
     border-radius: var(--radius-md);
+    width: 100%;
   }
   
   .content-type-tabs,
@@ -429,6 +430,7 @@ const totalResources = filteredResources.length;
     justify-content: center;
     gap: var(--spacing-xs);
     margin-bottom: var(--spacing-md);
+    
   }
   
   .content-type-tab,
@@ -441,6 +443,7 @@ const totalResources = filteredResources.length;
     cursor: pointer;
     transition: all 0.2s;
     background-color: var(--color-background);
+    color: var(--color-text-light);
   }
   
   .content-type-tab.active,
@@ -648,101 +651,139 @@ const totalResources = filteredResources.length;
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
-    // Get elements
-    const contentTypeTabs = document.querySelectorAll('.content-type-tab');
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    const resourceCards = document.querySelectorAll('.card.resource-card');
-    const searchInput = document.getElementById('resource-search');
-    const shuffleButton = document.querySelector('.shuffle-button');
-    const resourcesContainer = document.getElementById('resources-container');
-    const paginationContainer = document.getElementById('pagination-container');
-    
-    // Pagination settings
-    const postsPerPage = 9; // Set how many posts to show per page
-    let currentPage = 1;
-    let filteredCards = []; // Store filtered cards for pagination
-    
-    let activeContentType = 'all';
-    let activeTag = 'all';
-    let isShuffled = false;
-    
-    // Debug log all available resource cards
-    console.log("=== RESOURCE FILTERING DEBUG ===");
-    console.log(`Found ${resourceCards.length} resource cards total`);
-    
-    // Process all resource cards to ensure they have proper data attributes
-    resourceCards.forEach(card => {
-      const title = card.querySelector('.card-title')?.textContent || 'Unknown';
-      const contentType = card.getAttribute('data-content-type');
+  // Get elements using safer querySelector methods
+  const contentTypeTabs = document.querySelectorAll('.content-type-tab');
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  const resourceCards = document.querySelectorAll('.card.resource-card');
+  const searchInput = document.getElementById('resource-search');
+  const shuffleButton = document.querySelector('.shuffle-button');
+  const resourcesContainer = document.getElementById('resources-container');
+  const paginationContainer = document.getElementById('pagination-container');
+  
+  // Safe environment flag - set to false in production
+  const isDevelopmentMode = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1';
+  
+  // Pagination settings
+  const postsPerPage = 9; // Set how many posts to show per page
+  let currentPage = 1;
+  let filteredCards = []; // Store filtered cards for pagination
+  
+  let activeContentType = 'all';
+  let activeTag = 'all';
+  
+  // Safe logging function that only logs in development mode
+  function safeLog(...args) {
+    if (isDevelopmentMode) {
+      console.log(...args);
+    }
+  }
+  
+  // Helper function to sanitize strings for XSS prevention
+  function sanitizeString(input) {
+    if (typeof input !== 'string') {
+      return '';
+    }
+    return input
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+  
+  // Helper function to sanitize search input
+  function sanitizeSearchInput(input) {
+    if (typeof input !== 'string') {
+      return '';
+    }
+    // Remove any HTML/script tags and limit length
+    return input
+      .replace(/<\/?[^>]+(>|$)/g, '')
+      .trim()
+      .substring(0, 100); // Limit search length to prevent DoS
+  }
+  
+  // Helper function to validate content type
+  function isValidContentType(type) {
+    const validTypes = ['all', 'blog', 'product', 'website', 'app'];
+    return validTypes.includes(type);
+  }
+  
+  // Filter by content type
+  contentTypeTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Skip if this is the shuffle button
+      if (tab.getAttribute('data-action') === 'shuffle') {
+        return; // Let the dedicated shuffle handler handle this
+      }
       
-      // Get the tag data for logging
-      const tagsStr = card.getAttribute('data-tags') || '';
-      const tags = tagsStr ? tagsStr.split(',') : [];
-      
-      // Get the publication date for debugging
-      const pubDate = card.getAttribute('data-pub-date') || 'No date';
-      
-      console.log(`Card: "${title}", Type: ${contentType}, Tags: [${tags.join(', ')}], Date: ${pubDate}`);
-    });
-    
-    // Filter by content type
-    contentTypeTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        // Don't change active state for the shuffle button
-        if (tab.getAttribute('data-action') === 'shuffle') {
-          shuffleVisibleCards();
-          return;
+      // Update active tab UI
+      contentTypeTabs.forEach(t => {
+        if (!t.classList.contains('shuffle-button')) {
+          t.classList.remove('active');
         }
-        
-        // Update active tab
-        contentTypeTabs.forEach(t => {
-          if (!t.classList.contains('shuffle-button')) {
-            t.classList.remove('active');
-          }
-        });
-        tab.classList.add('active');
-        
-        activeContentType = tab.getAttribute('data-type');
-        console.log(`Content type filter changed to: ${activeContentType}`);
-        
-        // Reset to page 1 when changing filters
-        currentPage = 1;
-        filterResources();
       });
-    });
-    
-    // Filter by tag/category
-    filterTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tagValue = tab.getAttribute('data-tag');
-        console.log(`Tag tab clicked: ${tab.textContent} with data-tag=${tagValue}`);
-        
-        // Update active tab
-        filterTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        activeTag = tagValue;
-        console.log(`Tag filter changed to: ${activeTag}`);
-        
-        // Reset to page 1 when changing filters
-        currentPage = 1;
-        filterResources();
-      });
-    });
-    
-    // Filter by search term
-    searchInput?.addEventListener('input', () => {
-      // Reset to page 1 when searching
+      tab.classList.add('active');
+      
+      // Get the content type from data attribute
+      const typeValue = tab.getAttribute('data-type');
+      // Validate content type before using it
+      activeContentType = isValidContentType(typeValue) ? typeValue : 'all';
+      
+      safeLog(`Content type filter changed to: ${activeContentType}`);
+      
+      // Reset to page 1 when changing filters
       currentPage = 1;
+      
+      // Apply filtering
       filterResources();
     });
-    
-    // Create pagination controls
-    function createPagination(totalItems) {
-      if (!paginationContainer) return;
+  });
+  
+  // Filter by tag/category
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Get the tag value from data attribute
+      const tagValue = tab.getAttribute('data-tag');
       
+      // Update active tab UI
+      filterTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      // Set active tag with length limit for security
+      activeTag = tagValue ? tagValue.substring(0, 50) : 'all';
+      
+      safeLog(`Tag filter changed to: ${activeTag}`);
+      
+      // Reset to page 1 when changing filters
+      currentPage = 1;
+      
+      // Apply filtering
+      filterResources();
+    });
+  });
+  
+  // Filter by search term with debounce for performance
+  let searchTimeout;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        // Reset to page 1 when searching
+        currentPage = 1;
+        filterResources();
+      }, 300); // 300ms debounce
+    });
+  }
+  
+  // Create pagination controls
+  function createPagination(totalItems) {
+    if (!paginationContainer) return;
+    
+    try {
       // Clear existing pagination
-      paginationContainer.innerHTML = '';
+      paginationContainer.innerHTML = ''; // Simple clear for now
       
       // Calculate total pages
       const totalPages = Math.ceil(totalItems / postsPerPage);
@@ -771,7 +812,7 @@ const totalResources = filteredResources.length;
       const nextButton = document.createElement('button');
       nextButton.classList.add('pagination-button', 'next-button');
       nextButton.textContent = 'Next →';
-      nextButton.disabled = currentPage === totalPages;
+      nextButton.disabled = currentPage >= totalPages;
       nextButton.addEventListener('click', () => {
         if (currentPage < totalPages) {
           currentPage++;
@@ -779,7 +820,7 @@ const totalResources = filteredResources.length;
         }
       });
       
-      // Page indicator
+      // Page indicator - use textContent for safety
       const pageIndicator = document.createElement('span');
       pageIndicator.classList.add('page-indicator');
       pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
@@ -788,11 +829,15 @@ const totalResources = filteredResources.length;
       paginationContainer.appendChild(prevButton);
       paginationContainer.appendChild(pageIndicator);
       paginationContainer.appendChild(nextButton);
+    } catch (error) {
+      safeLog('Error creating pagination:', error);
     }
-    
-    // Update page display based on current page
-    function updatePageDisplay() {
-      // Hide all cards first
+  }
+  
+  // Update page display based on current page
+  function updatePageDisplay() {
+    try {
+      // Hide all filtered cards first
       filteredCards.forEach(card => {
         card.style.display = 'none';
       });
@@ -803,114 +848,156 @@ const totalResources = filteredResources.length;
       
       // Show cards for current page
       for (let i = startIndex; i < endIndex; i++) {
-        filteredCards[i].style.display = '';
+        if (filteredCards[i]) {
+          filteredCards[i].style.display = '';
+        }
       }
       
       // Update pagination controls
       createPagination(filteredCards.length);
       
-    }
-    
-    function shuffleVisibleCards() {
-  // Fisher-Yates shuffle
-  for (let i = filteredCards.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
-  }
-
-  // Clear current DOM
-  resourcesContainer.innerHTML = '';
-
-  // Append shuffled cards in new order
-  filteredCards.forEach(card => {
-    resourcesContainer.appendChild(card);
-  });
-
-  // Animate
-  filteredCards.forEach(card => {
-    card.classList.add('shuffled');
-  });
-
-  setTimeout(() => {
-    filteredCards.forEach(card => {
-      card.classList.remove('shuffled');
-      card.classList.add('shuffle-complete');
-    });
-
-    setTimeout(() => {
-      filteredCards.forEach(card => {
-        card.classList.remove('shuffle-complete');
-      });
-    }, 300);
-  }, 10);
-
-  // Reset to page 1 and update pagination
-  currentPage = 1;
-  updatePageDisplay();
-}
-    
-    // Enhanced filtering function
-    function filterResources() {
-      const searchTerm = searchInput?.value?.toLowerCase() || '';
-      
-      console.log(`=== FILTERING RESOURCES ===`);
-      console.log(`Active content type: ${activeContentType}`);
-      console.log(`Active tag: ${activeTag}`);
-      console.log(`Search term: ${searchTerm}`);
-      
-      // Reset filtered cards array
-      filteredCards = [];
-      
-      resourceCards.forEach(card => {
-        // Get card data for filtering
-        const cardContentType = card.getAttribute('data-content-type');
-        const title = card.querySelector('.card-title')?.textContent || '';
-        const description = card.querySelector('p')?.textContent?.toLowerCase() || '';
-        
-        // Get tags from data attribute
-        const tagsStr = card.getAttribute('data-tags-lower') || card.getAttribute('data-tags') || '';
-        const tags = tagsStr ? tagsStr.toLowerCase().split(',') : [];
-        
-        // Content type matching
-        let contentTypeMatch = activeContentType === 'all' || cardContentType === activeContentType;
-        
-        // Check tag match - use case-insensitive comparison
-        const activeTagLower = activeTag.toLowerCase();
-        const tagMatch = activeTag === 'all' || tags.includes(activeTagLower);
-        
-        // Check search match
-        const searchMatch = searchTerm === '' || 
-                           title.toLowerCase().includes(searchTerm) || 
-                           description.includes(searchTerm) || 
-                           tags.some(tag => tag.includes(searchTerm));
-        
-        // Apply combined filtering
-        if (contentTypeMatch && tagMatch && searchMatch) {
-          filteredCards.push(card);
-          console.log(`✅ Card "${title}" PASSED all filters`);
-        } else {
-          card.style.display = 'none';
-          console.log(`❌ Card "${title}" FAILED filtering`);
-        }
-      });
-      
-      // Update the page display
-      updatePageDisplay();
-      
-      // Reset shuffle status when filter changes
-      isShuffled = false;
-      
-      console.log(`=== FILTERING COMPLETE: ${filteredCards.length} visible items ===`);
-      
-      // Show a message if no results are found
+      // Show/hide no results message
       const noResultsEl = document.querySelector('.no-resources');
       if (noResultsEl) {
         noResultsEl.style.display = filteredCards.length === 0 ? 'block' : 'none';
       }
+    } catch (error) {
+      safeLog('Error updating page display:', error);
     }
+  }
+  
+  // Shuffle visible cards
+  function shuffleVisibleCards() {
+    try {
+      if (filteredCards.length <= 1) return; // No need to shuffle one or zero cards
+      
+      // Create a copy of the array to prevent direct mutation
+      const cardsToShuffle = [...filteredCards];
+      
+      // Fisher-Yates shuffle
+      for (let i = cardsToShuffle.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cardsToShuffle[i], cardsToShuffle[j]] = [cardsToShuffle[j], cardsToShuffle[i]];
+      }
+      
+      // Remove cards from container
+      filteredCards.forEach(card => {
+        if (card.parentNode === resourcesContainer) {
+          resourcesContainer.removeChild(card);
+        }
+      });
+      
+      // Add shuffled cards back to container
+      cardsToShuffle.forEach(card => {
+        resourcesContainer.appendChild(card);
+      });
+      
+      // Update filtered cards array with new order
+      filteredCards = cardsToShuffle;
+      
+      // Add animation classes
+      filteredCards.forEach(card => {
+        card.classList.add('shuffled');
+      });
+      
+      // Remove animation classes after a delay
+      setTimeout(() => {
+        filteredCards.forEach(card => {
+          card.classList.remove('shuffled');
+          card.classList.add('shuffle-complete');
+        });
+        
+        setTimeout(() => {
+          filteredCards.forEach(card => {
+            card.classList.remove('shuffle-complete');
+          });
+        }, 300);
+      }, 300);
+      
+      // Reset to page 1 and update display
+      currentPage = 1;
+      updatePageDisplay();
+    } catch (error) {
+      safeLog('Error shuffling cards:', error);
+    }
+  }
+  
+  // Main filtering function
+  function filterResources() {
+    try {
+      // Get search term
+      const searchTerm = sanitizeSearchInput(searchInput?.value || '').toLowerCase();
+      
+      safeLog(`Filtering resources:`);
+      safeLog(`- Content type: ${activeContentType}`);
+      safeLog(`- Tag: ${activeTag}`);
+      safeLog(`- Search: ${searchTerm}`);
+      
+      // Reset filtered cards array
+      filteredCards = [];
+      
+      // Process each card
+      resourceCards.forEach(card => {
+        // 1. Get necessary data from the card
+        const cardContentType = card.getAttribute('data-content-type');
+        const title = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
+        const description = card.querySelector('.card-description')?.textContent?.toLowerCase() || 
+                          card.querySelector('p')?.textContent?.toLowerCase() || '';
+        
+        // Get tag data and normalize
+        let cardTags = [];
+        const tagsStr = card.getAttribute('data-tags');
+        if (tagsStr) {
+          cardTags = tagsStr.toLowerCase().split(',').map(tag => tag.trim());
+        }
+        
+        // 2. Apply filters
+        const contentTypeMatch = activeContentType === 'all' || cardContentType === activeContentType;
+        const tagMatch = activeTag === 'all' || cardTags.includes(activeTag.toLowerCase());
+        const searchMatch = searchTerm === '' || 
+          title.includes(searchTerm) || 
+          description.includes(searchTerm) || 
+          cardTags.some(tag => tag.includes(searchTerm));
+        
+        // 3. Determine if card should be shown
+        if (contentTypeMatch && tagMatch && searchMatch) {
+          filteredCards.push(card);
+          safeLog(`Card matched: ${title}`);
+        } else {
+          // Hide non-matching cards
+          card.style.display = 'none';
+          safeLog(`Card hidden: ${title} (content type: ${contentTypeMatch}, tag: ${tagMatch}, search: ${searchMatch})`);
+        }
+      });
+      
+      // Update page display
+      updatePageDisplay();
+      
+      safeLog(`Found ${filteredCards.length} matching cards`);
+    } catch (error) {
+      safeLog('Error in filterResources:', error);
+    }
+  }
+  
+  // Add dedicated handler for shuffle button
+  if (shuffleButton) {
+    shuffleButton.addEventListener('click', () => {
+      safeLog('Shuffle button clicked');
+      shuffleVisibleCards();
+    });
+  }
+  
+  // Initialize on page load
+  try {
+    safeLog('Initializing resource grid...');
     
-    // Initialize filtering on load
-    console.log("Initializing resource filtering...");
+    // Initialize filter
     filterResources();
-  });
+    
+    // Log a success message
+    safeLog('Resource grid initialized successfully');
+  } catch (error) {
+    safeLog('Error initializing resource grid:', error);
+  }
+});
 </script>

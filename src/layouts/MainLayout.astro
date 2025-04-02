@@ -3,14 +3,39 @@
 import Header from '../components/Header.astro';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
+
+// Define props interface for SEO
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+// Extract props with defaults
+const { 
+  title = '4thelazy.com - Things for lazy people',
+  description = 'Discover curated resources, tools, and insights for the productively lazy.',
+} = Astro.props;
 ---
 
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4thelazy.com - Things for lazy people</title>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    
+  
+    
+    <!-- SEO Meta Tags -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.toString()} />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={Astro.url.toString()} />
   </head>
   <body>
     <Header />
