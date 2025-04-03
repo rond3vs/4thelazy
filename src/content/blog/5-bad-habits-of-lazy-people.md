@@ -1,8 +1,7 @@
 ---
 title: "5 Bad Habits of Lazy People"
-description: "A draft post still in progress."
+description: "Procrastinating, oversleeping, making excuses, getting distracted, and leaving projects unfinished."
 pubDate: 2021-03-28
-image: "/images/blog/default.jpg"
 tags: ["Productivity"]
 type: "blog"
 draft: false

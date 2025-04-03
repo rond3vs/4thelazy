@@ -3,17 +3,15 @@
 import Header from '../components/Header.astro';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
-
 // Define props interface for SEO
 interface Props {
   title?: string;
   description?: string;
 }
-
 // Extract props with defaults
 const { 
-  title = '4thelazy.com - Things for lazy people',
-  description = 'Discover curated resources, tools, and insights for the productively lazy.',
+  title = '4thelazy',
+  description = 'Discover curated resources, tools, and insights for lazy people.',
 } = Astro.props;
 ---
 
@@ -24,15 +22,14 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    
-  
+    <!-- Updated Content Security Policy to allow script loading and iframe communication -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src 'self' https://script.google.com https://script.googleusercontent.com https://embeds.beehiiv.com; form-action 'self' https://script.google.com https://script.googleusercontent.com;">
     
     <!-- SEO Meta Tags -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url.toString()} />
-    <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={Astro.url.toString()} />
@@ -42,8 +39,6 @@ const {
     <main>
       <slot />
     </main>
-    <footer class="bg-primary">
      <Footer />
-    </footer>
   </body>
 </html>
