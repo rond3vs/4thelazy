@@ -12,9 +12,7 @@ import Newsletter from './Newsletter.astro';
         </div>
       </div>
       <Newsletter />
-      <p class="hero-description">
-        Find tools and tips for lazy people like you 🫵 (and me). From fast food hacks to ways to be more productive.
-      </p>
+      
       <div class="scroll-arrow">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14M5 12l7 7 7-7"/>
@@ -70,7 +68,7 @@ import Newsletter from './Newsletter.astro';
   position: relative;
   animation: titleEntrance 1.5s ease-out forwards;
   opacity: 0;
-  margin-bottom: 0.5rem; /* Reduce space between title and tag */
+  margin-bottom: 1rem; /* Reduce space between title and tag */
 }
 
 .tag {
@@ -93,12 +91,13 @@ import Newsletter from './Newsletter.astro';
 
 .scroll-arrow {
   position: absolute;
-  bottom: -50px;
+  bottom: -100px;
   left: 50%;
   transform: translateX(-50%);
   animation: bounce 2s infinite;
   cursor: pointer;
   color: var(--color-primary);
+  margin-bottom: 1rem;
 }
 
 /* Animations */
