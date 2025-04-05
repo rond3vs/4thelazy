@@ -55,7 +55,7 @@ const isSponsoredContent = !!isSponsored;
 <MainLayout title={safeTitle} description={safeDescription}>
   <article class="blog-post">
     <div class="container">
-      <!-- Use a safer back link instead of inline JavaScript -->
+     
       <a href="javascript:void(0)" class="back-button" id="goBackButton">← Back</a>
       
       <header class="post-header">
@@ -98,6 +98,7 @@ const isSponsoredContent = !!isSponsored;
 </MainLayout>
 
 <style>
+  
   /* Back Button */
   .back-button {
     display: inline-flex;
@@ -133,7 +134,7 @@ const isSponsoredContent = !!isSponsored;
   }
   
   .post-header {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-sm);
     text-align: center;
   }
 
@@ -184,7 +185,7 @@ const isSponsoredContent = !!isSponsored;
   .post-title {
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
     line-height: 1.2;
     margin-bottom: var(--spacing-lg);
     color: var(--color-primary);
@@ -196,7 +197,6 @@ const isSponsoredContent = !!isSponsored;
     font-weight: 400;
     font-size: clamp(1rem, 1.5vw, 1.25rem);
     color: var(--color-text-light);
-    margin-bottom: var(--spacing-md);
     max-width: 650px;
     margin-left: auto;
     margin-right: auto;
@@ -366,7 +366,7 @@ const isSponsoredContent = !!isSponsored;
   /* Responsive Adjustments */
   @media (max-width: 768px) {
     .post-title {
-      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-size: clamp(2rem, 7vw, 3rem);
       margin-bottom: var(--spacing-md);
     }
     
