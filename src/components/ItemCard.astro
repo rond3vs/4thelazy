@@ -113,7 +113,7 @@ const contentEmojiLabel = {
 
         {tags.length > 0 && (
           <div class="card-tags">
-            {tags.slice(0, 2).map(tag => (
+            {tags.slice(0, 4).map(tag => (
               <span class="card-tag">{tag}</span>
             ))}
           </div>
@@ -133,6 +133,7 @@ const contentEmojiLabel = {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 200px;
   }
 
   .resource-card.card:hover {

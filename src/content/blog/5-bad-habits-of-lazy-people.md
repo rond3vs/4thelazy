@@ -1,53 +1,64 @@
 ---
 title: "5 Bad Habits of Lazy People"
 description: "Procrastinating, oversleeping, making excuses, getting distracted, and leaving projects unfinished."
-pubDate: 2021-03-28
+pubDate: 2025-04-06
 tags: ["Productivity"]
 type: "blog"
 draft: false
 ---
 
-We've all been there. I had a routine and a to-do list for the day, but then laziness got in the way.
+We’ve all done it.
 
-I could have the whole day with no other priorities and still get nothing done. Every once in a while, this isn't bad, but over and over again is bound to frustrate you.
+You make a to-do list. You’ve got the whole day free. You plan to get things done.
+And then… nothing happens.
 
-One day you say you'll do it later, and then the next thing you know, you've procrastinated a whole week, then a month, and even years. That is one example. You aren't lazy; you have lazy habits, and to stop, you have to be aware of what you're doing. So here are some habits that lazy people have.
+Once in a while? No big deal. But when it keeps happening, that is a problem.
+
+“I’ll do it tomorrow,” and suddenly it’s been a week. A month. A year.
+You’re not actually lazy but, you have the habits of a lazy person. 
+
+So here are a few of the usual suspects:
 
 ## 1. Procrastination
 
-Procrastination is the big one. Everybody procrastinates at some point in their life, but lazy people do it more than the rest.
+The obvious one. Everyone puts things off, but if it’s your go to move, it starts to snowball.
 
-Now patience is an excellent thing in life, but you should be proactive whenever you can when it comes to getting things done. Procrastination is such a detrimental habit to have. If there is one habit to break immediately, it should be this one!
+Waiting for the “perfect time” to start usually means it doesn’t get done.
+Just start. Even a little. Momentum is everything.
 
 ## 2. Sleeping In
 
-Sleep is essential, but sleeping in till noon is a problem. Your whole day is gone, and now you have to sleep again. Unless that was your plan? I get it—that snooze button is such a blessing sometimes. After the 7th time of hitting it, now it may have become a bad habit.
+Sleep matters—but when you’re waking up at noon, it’s hard to get anything done.
 
-Now you're late for work, school, and you missed breakfast—all for a little more sleep. Sleeping in late is another habit that lazy people tend to have. I'm not saying become an early bird or not get your total 8 hours of sleep. Focus on that. I'm saying aim to make waking up on time the new habit.
+No need to wake up at 5 a.m. Just aim to get up at a consistent, reasonable time. That alone can shift your entire day.
 
-## 3. Make Excuses
+## 3. Making Excuses
+* “My alarm didn’t go off.”
+* “I forgot.”
+* “I was too busy.”
+* "I didn't have time."
+* "I was watching Severance."
 
-- "Alarm didn't go off."
-- "My phone died."
-- "I was watching *Euphoria*."
-- "I forgot."
+Sometimes stuff happens. But if you’re always finding reasons not to do things, it’s probably not the world—it’s a habit.
 
-All these excuses—if you manage your time better, you won’t need them. Making excuses is not the way to go in life. From one bum to another, this is a horrible habit. Some things come up in life, but people can recognize this bad habit coming from you a mile away. Make this your second-priority bad habit to break as a lazy person.
+Being honest with yourself is the first fix.
 
-## 4. Too Much Time With Distractions
+## 4. Distracted Constantly 
 
-Twitter, TikTok, Instagram, Snapchat, YouTube, Facebook, etc... There's so much distraction! HBO Max, Netflix, Hulu! Removing distractions is hard, especially since it's every form of entertainment you could ask for, everywhere you look. This is one habit everyone needs to break from—not only lazy people. I can't even lie; this may be the hardest one.
+Distractions are everywhere. And they’re way too good at stealing time.
 
-So many funny memes; how could your boss get mad at you for not doing your job? It's not a bad thing to watch or be on social media all day, but you know what they say: "everything is good in moderation." Some of you put in whole 8-hour shifts on social media and don't make any money off it (myself included). Instead, use entertainment as a reward for when you get things done. Try to turn this bad habit into more of a reward for yourself.
+You don’t have to quit cold turkey. Just try using them as a reward instead of an escape. Get one thing done, then scroll.
 
-## 5. Starting New Projects and Not Finishing
+## 5. Starting but Not Finishing
 
-So many ideas! That's what happens when you're on the couch all day. I've been there. Started a project, but then a new idea pops in your head, and you have to jump on it. You say to yourself, "I'll come back to it," or "I can do both at the same time." Then no project ends up getting finished. Now you have everybody asking, *"Have you finished that one project yet?"* and you respond, *"No."*
+Ideas are easy. Sticking with them is the hard part.
 
-That's alright because now you know it's a habit (mixed in with a little bit of fear of failure and FOMO).
-
-You're now aware of what you're doing. Next time, start small, stay consistent on ONE project, and build up from there. We think we can manage more than one project at a time, but that's rarely the case. Step by step, little by little, and you will get there.
+If you keep jumping from one thing to another, nothing gets finished.
+Pick one. Stick to it. Finish it before starting the next shiny idea.
 
 ---
 
-As with any habit, they can break. I'm not saying that you are lazy because you have these habits; you can have only one of them and not be lazy. Even hardworking people struggle with some of these, if not all of them. I know as a lazy person you don't want to hear this, but it's going to take some work. *Yuck,* I know—but you got it. The first step to break habits is to be aware of them first.
+Even hardworking people struggle with these habits. The difference is they notice them and try to do better.
+
+You don’t have to fix everything overnight. Just pick one habit, and take a small step. That’s how change actually happens.
+

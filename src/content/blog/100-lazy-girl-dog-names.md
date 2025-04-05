@@ -1,10 +1,10 @@
 ---
 title: "100 Lazy Girl Dog Names"
-description: "A helpful post from 4thelazy.com."
-pubDate: 2024-09-02
+description: "Find ideal names for you lazy girl. A list of names that will make your dog happy."
+pubDate: 2025-04-06
 tags: ['Pets']
 type: "Blog"
-draft: true
+draft: false
 ---
 
 Lazy Girl Dog Names: The Perfect Monikers for Your Chilled-Out Canine Companion

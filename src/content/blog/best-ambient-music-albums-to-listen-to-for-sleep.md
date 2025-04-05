@@ -1,10 +1,9 @@
 ---
-draft: true
+draft: false
 title: "Best Ambient Music Albums To Listen To For Sleep"
 description: "Relax, unwind, and drift off with these top ambient music picks for better sleep."
-pubDate: 2023-04-02
-image: "/images/blog/ambient-music-for-sleep.jpg"
-tags: ["Music"]
+pubDate: 2025-04-06
+tags: ["Music", "Sleep", "Health",]
 type: "Blog"
 ---
 

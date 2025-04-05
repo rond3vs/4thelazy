@@ -1,93 +1,85 @@
 ---
 title: "12 Best iPhone Shortcuts"
-description: "A pending post not yet published."
-pubDate: 2022-01-08
-image: "/images/blog/default.jpg"
-tags: ["Tech", "Productivity"]
+description: "Use these shortcuts for automating tasks, saving time, and simplifying daily routines."
+pubDate: 2025-04-06
+tags: ["Tech", "Productivity", "iPhone",]
 type: "blog"
-draft: true
+draft: false
 ---
 
-If you aren’t using shortcuts, then you are using your iPhone wrong. Simple as that. They can be a iPhone user’s best friend. There’s so much untapped potential with shortcuts.
+Are you fully leveraging your iPhone's capabilities? If you're not using Shortcuts, you might be missing out on powerful automation that can save you time and streamline everyday tasks. They are a fantastic tool for any iPhone user, offering vast, often untapped potential.
 
 ## What are Shortcuts?
 
-Shortcuts are the future of the iPhone. Shortcuts are one of the features introduced in IOS 12. You can use them to automate tasks on your phone. With shortcuts you can set multiple alarms simultaneously, eject water out of your phone, and turn your Wi-Fi in a QR code. Shortcuts have many possibilities, and you can create your own shortcut if you wanted to.
+Introduced back in iOS 12, the Shortcuts app allows you to create automations for tasks you perform frequently on your Apple devices. A shortcut can perform a single action or string together multiple complex steps across different apps. Think setting multiple alarms instantly, getting water out of your speakers using sound frequencies, quickly sharing your Wi-Fi via QR code, or dictating a note without opening the Notes app. The possibilities are extensive, and you can even build your own custom shortcuts tailored to your specific needs.
 
-So here’s a list of top tier shortcuts you must-have for your iPhone:
+Ready to dive in? Here are 11 excellent Shortcuts worth adding to your iPhone:
 
 ## QR WIFI
 
-![QR WIFI Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Saturday-08-Jan-2022-143255-508x1024.png)
 
-“What’s the WiFi password?”
-
-"What's the WiFi?
-
-We've all heard this before. Then you have to get up and look at the bottom of your router and give them the WiFi password. Now you're slowly typing the WiFi password in their phone carefully making sure you didn't make a mistake. If you have an iPhone it may be different you're able to share WiFi with another apple product.
-
-Now with this shortcut, all you have to do is enter your Wi-Fi name and password and the shortcut will automatically turn into a QR code. Let's say you have a few people over and they need the wifi password, just turn it into a QR code and let your guest scan your phone. Ten times better than getting up from the couch and looking for the password.
+Tired of reciting your complex Wi-Fi password whenever guests visit? Or slowly typing it into their devices? While sharing between Apple devices is easy, this shortcut simplifies it for everyone else. Just input your Wi-Fi network name (SSID) and password once, and the shortcut generates a QR code. Guests can simply scan the code with their phone's camera to connect instantly. Much easier than hunting for the router!
 
 ## DTwitter
 
-![DTwitter Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-195858-1024x667.png)
-
-I don't know why Twitter doesn't let you save videos, but luckily there are people out there that have our backs. So many memes and funny videos on Twitter that sometimes it's only right that you save them to your camera roll. Add them to your arsenal of memes or just save them later for yourself.
+Twitter doesn't offer a native video download option, but this popular shortcut fills the gap. Found a hilarious meme or useful video clip you want to save for later or share outside of Twitter? Run this shortcut from the share sheet on a tweet containing a video, and it will download the video directly to your camera roll.
 
 ## Set Some Alarms
 
 ![Set Some Alarms Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-194622-1024x667.png)
 
-Set multiple alarms at the same time at whatever interval you want. We all set multiple alarms so we get up on time, but setting each one, one by one takes too much time. Use this shortcut to choose how many alarms you want to be set and then how many minutes in between them.
+Many of us set multiple alarms to ensure we wake up on time, but setting each one individually can be tedious. This shortcut lets you specify how many alarms you need and the interval (in minutes) between them. It then creates all the alarms for you in one go.
 
 ## Dictate to Notes
 
 ![Dictate to Notes Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-194713-508x1024.png)
 
-Have you had an idea or thought that you quickly needed to write down in your notes, but let’s be honest, we're too lazy to open up the notes app? Yeah, that’s where this shortcut comes into play.
-
-Dictate to Notes records what you say and automatically adds it to the iPhone notes app. Save that quick thought or idea automatically in your notes app and come back to it later.
+Ever have a brilliant idea or urgent thought you need to jot down quickly? Instead of fumbling to open the Notes app and type, use this shortcut. Simply activate it, speak your thought, and the shortcut transcribes your dictation and saves it automatically as a new note. Perfect for capturing fleeting ideas on the go.
 
 ## Delete Last Photo
 
 ![Delete Last Photo Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/IMG_7425-508x1024.png)
 
-I hate when I accidentally screenshot something on my phone. Then either I forget or I am too lazy to delete it. This shortcut comes in handy all the time for me. I don't know how I get so many random screenshots in my phone. With this shortcut I can finally quickly delete them and never have to worry about it again. You can even set it to delete more than one recent photos.
+Accidental screenshots happen all the time and clutter up the camera roll. If you often forget or can't be bothered to delete them immediately, this shortcut is a lifesaver. Run it to quickly delete the very last photo (or configure it to delete the last few photos) without needing to open the Photos app.
 
 ## Speed Dial
 
 ![Speed Dial Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-200737-508x1024.png)
 
-Create your own speed dial. This is way faster than using favorites in the contacts app or using siri. Since most of us only regularly call like 2-3 people, add them to your speed dial.
+Create a personalized speed dial list for your most frequent contacts. While the Contacts app has Favorites and Siri can initiate calls, this shortcut presents a simple menu with your chosen people for ultra-fast calling. Ideal for the 2-3 individuals you contact most regularly.
 
-## Find Gas (or Anything)
+## Find Gas (or Anything Nearby)
 
 ![Find Gas Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-201714-508x1024.png)
 
-Instead of typing in maps "nearest gas station" use can just click this shortcut and it will automatically bring up a list of gas station nearest to you. The best part about this, is that you can set this to whatever you like. Set it up so you can find the nearest restaurants, gas stations, hospitals, etc..
+Instead of opening Maps and typing "nearest gas station" or "coffee shops near me," this shortcut does it with one tap. It pulls up a list of nearby locations for a category you define. The best part? You can easily customize it to find restaurants, ATMs, hospitals, parks, or whatever you frequently search for nearby.
 
 ## PiP Youtube
 
 ![PiP Youtube Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-201345-1024x1008.png)
 
-Place Youtube videos in Pictures-in-Picture mode. Now you can scroll social media and watch YouTube at the same time. Just like you can with FaceTime, you can do the same. This does require you to download the Scriptable app from the App Store, but its free!
+Wish you could watch YouTube videos in Picture-in-Picture mode while scrolling through social media or Browse the web, just like with FaceTime? This shortcut makes it possible. Note: This typically requires installing the free Scriptable app from the App Store, which allows for more advanced shortcut actions.
 
 ## Time Travel to Address
 
 ![Time Travel to Address Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/IMG_7431-1024x667.png)
 
-Instead of typing in maps "nearest gas station" use can just click this shortcut and it will automatically bring up a list of gas station nearest to you. The best part about this, is that you can set this to whatever you like. Set it up so you can find the nearest restaurants, gas stations, hospitals, etc..
+Instantly estimate your travel time to a specific destination. This shortcut can often pull an address from your clipboard or a calendar event and calculate how long it will take to drive there based on current traffic conditions, saving you from manually opening Maps and entering the details.
 
 ## Water Eject
 
 ![Water Eject Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-200643-508x1024.png)
 
-Pretty self explanatory. Get the water out of your speakers with this shorcut. This uses your iPhone's speakers to generate a certain frequency to vibrate the water out of your phone.
+Accidentally got your iPhone wet? This shortcut helps clear water from the speaker grills. It works by playing a specific low-frequency sound that vibrates the speakers, helping to push out trapped water droplets. A useful tool inspired by a similar feature on the Apple Watch.
 
 ## Reverse Image Search
 
 ![Reverse Image Search Shortcut](https://4thelazy.com/wp-content/uploads/2022/01/Friday-07-Jan-2022-195511-1024x1008.png)
 
-If you have an image and want to know where it came from or if you’re getting catfished use this shortcut. Download the image and let technology do the rest. If google can't find it then you're out of luck.
+Need to find the source of an image, identify something in a photo, or check if a profile picture is potentially fake ("catfishing")? This shortcut lets you quickly perform a reverse image search. Select an image from your photo library or the share sheet, and it will upload it to a search engine like Google Images to find visually similar images online.
 
-These are the best shortcuts I have found. Shortcuts are the next wave in my opinion. Unlike apps where they want you to sign up with email, and then make an account, Shortcuts just let you use them. No sign up or anything. No email notifications, just straight vibes. If you like this please share it with someone who you think can benefit from this post!
+---
+
+These are just a handful of examples showcasing how Shortcuts can streamline your iPhone experience. One of the best aspects is their simplicity – unlike many apps, they usually don't require sign-ups, accounts, or permissions beyond what's needed for the task. Exploring and using Shortcuts can genuinely enhance your productivity and make interacting with your iPhone more efficient.
+
+If you found this list helpful, consider sharing it with others who might benefit!
