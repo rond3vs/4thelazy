@@ -22,7 +22,6 @@ const {
   updatedDate, 
   image, 
   tags, 
-  type, 
   isSponsored,
   description 
 } = Astro.props;
@@ -56,7 +55,7 @@ const isSponsoredContent = !!isSponsored;
   <article class="blog-post">
     <div class="container">
      
-      <a href="javascript:void(0)" class="back-button" id="goBackButton">← Back</a>
+      <a href="/#browse-section" class="back-button" id="goBackButton">← Back</a>
       
       <header class="post-header">
         {isSponsoredContent && <div class="sponsored-badge">Sponsored</div>}
@@ -397,21 +396,3 @@ const isSponsoredContent = !!isSponsored;
   }
 </style>
 
-<script>
-  // Safe back button implementation
-  document.addEventListener('DOMContentLoaded', () => {
-    const backButton = document.getElementById('goBackButton');
-    if (backButton) {
-      backButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        // Check if there's history to go back to
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          // Fallback to home page if no history
-          window.location.href = '/';
-        }
-      });
-    }
-  });
-</script>

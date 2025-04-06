@@ -3,6 +3,8 @@
 import Header from '../components/Header.astro';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
+
+
 // Define props interface for SEO
 interface Props {
   title?: string;
@@ -13,6 +15,7 @@ const {
   title = '4thelazy',
   description = 'Discover curated resources, tools, and insights for lazy people.',
 } = Astro.props;
+import { ClientRouter } from 'astro:transitions';
 ---
 
 <!DOCTYPE html>
@@ -30,9 +33,12 @@ const {
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url.toString()} />
+    
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8IS0tIEJhY2tncm91bmQgLS0+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIyMCIgZmlsbD0iIzIwNmE1ZCIvPgogIAogIDwhLS0gVGV4dCAtLT4KICA8dGV4dCB4PSI1MCIgeT0iNjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iNDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIj40dGw8L3RleHQ+Cjwvc3ZnPg==" />
     <link rel="canonical" href={Astro.url.toString()} />
+    <ClientRouter />
+
   </head>
   <body>
     <Header />
