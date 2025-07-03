@@ -4,7 +4,7 @@ description: "Use these shortcuts for automating tasks, saving time, and simplif
 pubDate: 2025-04-06
 tags: ["Tech", "Productivity", "iPhone",]
 type: "blog"
-draft: false
+draft: true
 ---
 
 Are you fully leveraging your iPhone's capabilities? If you're not using Shortcuts, you might be missing out on powerful automation that can save you time and streamline everyday tasks. They are a fantastic tool for any iPhone user, offering vast, often untapped potential.

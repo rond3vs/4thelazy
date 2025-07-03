@@ -4,7 +4,7 @@ description: "Explore back-friendly careers, understand risk factors, and get pr
 pubDate: 2025-04-05 
 tags: ["Health", "Job",]
 type: "blog"
-draft: false
+draft: true
 ---
 
 Back pain is incredibly common, affecting around 80% of adults at some point. It's a leading cause of missed work and disability, significantly impacting daily life and career choices. But living with back pain doesn't mean you have to give up on finding a fulfilling job. This guide offers more in-depth insights into navigating the working world with back issues.
