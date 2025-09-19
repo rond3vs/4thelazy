@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^9.4.3",
     "amazon-paapi5": "^0.0.0-alpha.4",
     "astro": "^5.6.1",
     "dotenv": "^17.2.2"
