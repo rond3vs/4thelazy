@@ -1,4 +1,5 @@
 // src/pages/api/paapi/[asin].ts
+export const prerender = false;
 import type { APIRoute } from 'astro';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
