@@ -24,6 +24,17 @@ const productsCollection = defineCollection({
   schema: z.object({
     ...baseSchema,
     affiliateLink: z.string(),
+
+    // ✅ add these fields
+    price: z.number().optional(),
+    currency: z.string().default('USD').optional(),
+    rating: z.number().min(0).max(5).optional(),
+    asin: z.string().optional(),
+    image: z.string().url().optional(),
+    developer: z.string().optional(),
+    version: z.string().optional(),
+    isFreemium: z.boolean().optional(),
+    hasSubscription: z.boolean().optional(),
   }),
 });
 
@@ -32,6 +43,15 @@ const appsCollection = defineCollection({
     ...baseSchema,
     platform: z.array(z.enum(['iOS', 'Android', 'Web', 'macOS', 'Windows', 'Linux'])),
     downloadLink: z.string().optional(),
+
+    // ✅ add these to match your ItemGrid usage
+    price: z.number().optional(),
+    currency: z.string().default('USD').optional(),
+    rating: z.number().min(0).max(5).optional(),
+    developer: z.string().optional(),
+    version: z.string().optional(),
+    isFreemium: z.boolean().optional(),
+    hasSubscription: z.boolean().optional(),
   }),
 });
 
@@ -39,6 +59,15 @@ const websitesCollection = defineCollection({
   schema: z.object({
     ...baseSchema,
     url: z.string().url(),
+
+    // 🔽 Add these
+    currency: z.string().default('USD').optional(),
+    rating: z.number().min(0).max(5).optional(),
+    technologies: z.array(z.string()).optional(),
+    services: z.array(z.string()).optional(),
+    hasFreeTier: z.boolean().optional(),
+    hasPaidPlan: z.boolean().optional(),
+    monthlyPrice: z.number().optional(),
   }),
 });
 

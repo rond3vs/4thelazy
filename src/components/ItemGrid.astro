@@ -1,48 +1,52 @@
 ---
 // src/components/ItemGrid.astro
-import { getCollection } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import ItemCard from './ItemCard.astro';
 
-// Extended props to support more flexible filtering
+// Props (left in place but NOT used for server-side filtering anymore)
 interface Props {
   tag?: string;
   limit?: number;
-  contentType?: string; // Allow any content type as a string
-  debug?: boolean; // Enable debug mode
-  includeAllDates?: boolean; // Option to include all dates or not
+  contentType?: 'all' | 'blog' | 'product' | 'app' | 'website';
+  debug?: boolean;
+  includeAllDates?: boolean;
 }
 
-// Enhanced resource interface to support all collection types
+// Unified resource shape used by the grid
 interface Resource {
   type: 'blog' | 'product' | 'app' | 'website';
-  data: CollectionEntry<'blog'> | CollectionEntry<'products'> | CollectionEntry<'apps'> | CollectionEntry<'websites'>;
+  data:
+    | CollectionEntry<'blog'>
+    | CollectionEntry<'products'>
+    | CollectionEntry<'apps'>
+    | CollectionEntry<'websites'>;
   slug: string;
   title: string;
   description: string;
-  image: string;
+  image?: string;
   pubDate: Date;
   updatedDate?: Date;
-  isSponsored: boolean;
-  
-  // Collection-specific fields
-  tags?: string[];            // For blog
-  categories?: string[];      // For products, apps, websites
-  price?: number;             // For products, apps
-  currency?: string;          // For products, apps, websites
-  rating?: number;            // For products, apps, websites
-  affiliateLink?: string;     // For products
-  draft?: boolean;            // For blog
-  
-  // App-specific fields
+  isSponsored?: boolean;
+
+  // Common/optional
+  tags?: string[];
+  categories?: string[];
+  price?: number;
+  currency?: string;
+  rating?: number;
+
+  // Product-specific
+  affiliateLink?: string;
+
+  // App-specific
   platform?: string[];
   developer?: string;
   version?: string;
   isFreemium?: boolean;
   hasSubscription?: boolean;
   downloadLink?: string;
-  
-  // Website-specific fields
+
+  // Website-specific
   url?: string;
   technologies?: string[];
   services?: string[];
@@ -51,166 +55,151 @@ interface Resource {
   monthlyPrice?: number;
 }
 
-const { 
-  tag, 
-  limit, 
-  contentType = 'all', 
+const {
+  tag,            // kept for debug panel only
+  limit,          // kept for debug panel only
+  contentType = 'all', // kept for debug panel only
   debug = false,
-  includeAllDates = true
-} = Astro.props;
+  includeAllDates = true,
+} = Astro.props as Props;
 
-// Get all collections and filter out drafts (assuming missing pubDate means a draft)
+const fmt = (amount?: number, currency = 'USD') =>
+  typeof amount === 'number'
+    ? new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount)
+    : undefined;
+
+// Load collections (skip drafts)
 const allBlogPosts = await getCollection('blog', ({ data }) => !data.draft);
-const allProducts = await getCollection('products', ({ data }) => !data.draft);
-const allApps = await getCollection('apps', ({ data }) => !data.draft);
-const allWebsites = await getCollection('websites', ({ data }) => !data.draft);
+const allProducts  = await getCollection('products', ({ data }) => !data.draft);
+const allApps      = await getCollection('apps', ({ data }) => !data.draft);
+const allWebsites  = await getCollection('websites', ({ data }) => !data.draft);
 
-// Collection counts for debugging
+// Counts (debug)
 const blogCount = allBlogPosts.length;
 const productCount = allProducts.length;
 const appCount = allApps.length;
 const websiteCount = allWebsites.length;
 
-// Debug log
 if (debug) {
-  console.log("=== DEBUG: COLLECTION COUNTS ===");
-  console.log(`Blog posts: ${blogCount}`);
-  console.log(`Products: ${productCount}`);
-  console.log(`Apps: ${appCount}`);
-  console.log(`Websites: ${websiteCount}`);
-  
-  console.log("=== DEBUG: ALL BLOG POSTS ===");
-  allBlogPosts.forEach(post => {
-    console.log(`Post: ${post.slug}, Date: ${post.data.pubDate}, Tags: [${post.data.tags?.join(', ') || 'none'}]`);
-  });
+  console.log('=== DEBUG: COLLECTION COUNTS ===');
+  console.log({ blogCount, productCount, appCount, websiteCount });
 }
 
-// Sort collections by publication date (newest first)
-const sortedBlogPosts = allBlogPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-const sortedProducts = allProducts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-const sortedApps = allApps.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-const sortedWebsites = allWebsites.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+// Sort copies by date desc
+const sortedBlogPosts = [...allBlogPosts].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedProducts  = [...allProducts].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedApps      = [...allApps].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedWebsites  = [...allWebsites].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-// Combine and prepare all resources
+// Build unified list
 let allResources: Resource[] = [];
 
-// Map blog posts to resources
-allResources = [
-  ...allResources,
+// Blog
+allResources.push(
   ...sortedBlogPosts.map((post) => ({
     type: 'blog' as const,
     data: post,
     slug: post.slug,
     title: post.data.title,
     description: post.data.description || '',
-    image: '', // No image
+    image: undefined,
     pubDate: post.data.pubDate,
     updatedDate: post.data.updatedDate,
     isSponsored: post.data.isSponsored || false,
-    tags: post.data.tags || []
-  }) as Resource)
-];
+    tags: post.data.tags || [],
+  }))
+);
 
-// Map products to resources
-allResources = [
-  ...allResources,
+// Products
+allResources.push(
   ...sortedProducts.map((product) => ({
     type: 'product' as const,
     data: product,
     slug: product.slug,
     title: product.data.title,
     description: product.data.description || '',
-    image: '',
+    image: undefined,
     pubDate: product.data.pubDate || new Date(),
     updatedDate: product.data.updatedDate,
     affiliateLink: product.data.affiliateLink || '',
-    tags: product.data.tags || []
-  }) as Resource)
-];
+    tags: product.data.tags || [],
+    price: product.data.price,
+    currency: product.data.currency || 'USD',
+    rating: product.data.rating,
+  }))
+);
 
-// Map apps to resources
-allResources = [
-  ...allResources,
+// Apps
+allResources.push(
   ...sortedApps.map((app) => ({
     type: 'app' as const,
     data: app,
     slug: app.slug,
     title: app.data.title,
     description: app.data.description || '',
-    image: '',
+    image: undefined,
     pubDate: app.data.pubDate || new Date(),
     updatedDate: app.data.updatedDate,
     isSponsored: app.data.isSponsored || false,
     platform: app.data.platform || [],
     downloadLink: app.data.downloadLink || '',
-    tags: app.data.tags || []
-  }) as Resource)
-];
+    tags: app.data.tags || [],
+    price: app.data.price,
+    currency: app.data.currency || 'USD',
+    rating: app.data.rating,
+    developer: app.data.developer,
+    version: app.data.version,
+    isFreemium: app.data.isFreemium,
+    hasSubscription: app.data.hasSubscription,
+  }))
+);
 
-// Map websites to resources
-allResources = [
-  ...allResources,
+// Websites
+allResources.push(
   ...sortedWebsites.map((website) => ({
     type: 'website' as const,
     data: website,
     slug: website.slug,
     title: website.data.title,
     description: website.data.description || '',
-    image: '',
+    image: undefined,
     pubDate: website.data.pubDate || new Date(),
     updatedDate: website.data.updatedDate,
     isSponsored: website.data.isSponsored || false,
     url: website.data.url || '',
-    tags: website.data.tags || []
-  }) as Resource)
-];
+    tags: website.data.tags || [],
+    currency: website.data.currency || 'USD',
+    rating: website.data.rating,
+    technologies: website.data.technologies,
+    services: website.data.services,
+    hasFreeTier: website.data.hasFreeTier,
+    hasPaidPlan: website.data.hasPaidPlan,
+    monthlyPrice: website.data.monthlyPrice,
+  }))
+);
 
-// Sort combined resources by date
-let filteredResources = allResources.sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
+// ✅ Sort combined by date (NO server-side filtering or slicing)
+let filteredResources = allResources.sort(
+  (a, b) => b.pubDate.valueOf() - a.pubDate.valueOf()
+);
 
-// Filter by content type
-if (contentType && contentType !== 'all') {
-  filteredResources = filteredResources.filter(resource => resource.type === contentType);
-}
-
-// Filter by tag/category
-if (tag && tag !== 'all') {
-  const lowerTag = tag.toLowerCase();
-  filteredResources = filteredResources.filter(resource =>
-    Array.isArray(resource.tags) &&
-    resource.tags.map(t => t.toLowerCase()).includes(lowerTag)
-  );
-}
-
-// Apply limit
-if (limit && !tag) {
-  filteredResources = filteredResources.slice(0, limit);
-} else if (limit && tag) {
-  filteredResources = filteredResources.slice(0, Math.max(30, limit));
-}
-
-// Get all unique tags/categories from all resources
+// Tag cloud
 const allTagsSet = new Set<string>();
-allResources.forEach(resource => {
-  if (resource.tags && Array.isArray(resource.tags)) {
-    resource.tags.forEach(tag => allTagsSet.add(tag));
-  }
-  if (resource.categories && Array.isArray(resource.categories)) {
-    resource.categories.forEach(category => allTagsSet.add(category));
-  }
+allResources.forEach((r) => {
+  r.tags?.forEach((t) => allTagsSet.add(t));
+  r.categories?.forEach((c) => allTagsSet.add(c));
 });
 const allTags = Array.from(allTagsSet).sort();
 
-// Calculate counts for each content type
+// Counts for debug
 const categoryCounts = {
   all: allResources.length,
-  blog: allResources.filter(r => r.type === 'blog').length,
-  product: allResources.filter(r => r.type === 'product').length,
-  website: allResources.filter(r => r.type === 'website').length,
-  app: allResources.filter(r => r.type === 'app').length,
+  blog: allResources.filter((r) => r.type === 'blog').length,
+  product: allResources.filter((r) => r.type === 'product').length,
+  website: allResources.filter((r) => r.type === 'website').length,
+  app: allResources.filter((r) => r.type === 'app').length,
 };
 
-// Calculate debug information
 const totalResources = filteredResources.length;
 ---
 
@@ -220,7 +209,7 @@ const totalResources = filteredResources.length;
     <p class="section-description">
       Search through the collection of blog posts, products, apps, and websites to find something that may or may not help you 🤷‍♂️
     </p>
-    
+
     {debug && (
       <div class="debug-panel">
         <h3>Debug Information</h3>
@@ -234,13 +223,14 @@ const totalResources = filteredResources.length;
           <li>Products: {categoryCounts.product}</li>
           <li>Websites: {categoryCounts.website}</li>
           <li>Apps: {categoryCounts.app}</li>
-          <li>Current filter: {contentType}</li>
-          <li>Tag filter: {tag || 'none'}</li>
+          <li>Current filter prop (unused client-side): {contentType}</li>
+          <li>Tag prop (unused client-side): {tag || 'none'}</li>
+          <li>Limit prop (unused client-side): {typeof limit === 'number' ? limit : 'none'}</li>
           <li>Include All Dates: {includeAllDates ? 'Yes' : 'No'}</li>
         </ul>
       </div>
     )}
-    
+
     <div class="filter-container">
       <div class="search-box">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -249,16 +239,16 @@ const totalResources = filteredResources.length;
         </svg>
         <input type="text" id="resource-search" placeholder="Search..." />
       </div>
-      
+
       <!-- Content type filter tabs -->
-      <div class="content-type-tabs">
-        <button class="content-type-tab active" data-type="all">All</button>
-        <button class="content-type-tab" data-type="blog">Blog Posts</button>
-        <button class="content-type-tab" data-type="product">Products</button>
-        <button class="content-type-tab" data-type="website">Websites</button>
-        <button class="content-type-tab" data-type="app">Apps</button>
-        
-        <button class="content-type-tab shuffle-button" data-action="shuffle">
+      <div class="content-type-tabs" role="tablist">
+        <button class="content-type-tab active" data-type="all" role="tab" aria-pressed="true">All ({categoryCounts.all})</button>
+        <button class="content-type-tab" data-type="blog" role="tab" aria-pressed="false">Blog Posts ({categoryCounts.blog})</button>
+        <button class="content-type-tab" data-type="product" role="tab" aria-pressed="false">Products ({categoryCounts.product})</button>
+        <button class="content-type-tab" data-type="website" role="tab" aria-pressed="false">Websites ({categoryCounts.website})</button>
+        <button class="content-type-tab" data-type="app" role="tab" aria-pressed="false">Apps ({categoryCounts.app})</button>
+
+        <button class="content-type-tab shuffle-button" data-action="shuffle" role="button" aria-label="Shuffle results">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
             <path d="M16 3H21V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 20L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -269,14 +259,14 @@ const totalResources = filteredResources.length;
           Shuffle
         </button>
       </div>
-      
+
       <!-- Tags filter -->
       <div class="tags-filter">
         <h3 class="filter-title">Filter by tags</h3>
-        <div class="filter-tabs" id="tag-filters">
-          <button class="filter-tab active" data-tag="all">All</button>
+        <div class="filter-tabs" id="tag-filters" role="tablist">
+          <button class="filter-tab active" data-tag="all" role="tab" aria-pressed="true">All</button>
           {allTags.map((tagName) => (
-            <button class="filter-tab" data-tag={tagName}>{tagName}</button>
+            <button class="filter-tab" data-tag={tagName} role="tab" aria-pressed="false">{tagName}</button>
           ))}
         </div>
       </div>
@@ -286,73 +276,63 @@ const totalResources = filteredResources.length;
     <div class="resources-grid" id="resources-container">
       {filteredResources.length > 0 ? (
         filteredResources.map((resource) => {
-          // Base props for all content types, with image removed
           const baseProps = {
             title: resource.title,
             link: `/${resource.type}/${resource.slug}`,
             description: resource.description,
             contentType: resource.type,
-            isSponsored: resource.isSponsored,
+            isSponsored: resource.isSponsored ?? false,
             pubDate: resource.pubDate.toISOString(),
             updatedDate: resource.updatedDate?.toISOString(),
-            image: '', // No image
+            image: resource.image,
+            tags: resource.tags || [],
+            // Add data attributes for filtering
+            'data-content-type': resource.type,
+            'data-tags': (resource.tags || []).join(','),
+            'data-title': resource.title,
+            'data-description': resource.description,
           };
-          
-          // Add specific props based on content type
-          let specificProps = {};
-          
+
           if (resource.type === 'blog') {
-            specificProps = {
-              tags: resource.tags || [],
-              type: resource.type || '',
-            };
-          } 
-          else if (resource.type === 'product') {
-            specificProps = {
-              tags: resource.tags || [],
-              categories: resource.categories || [],
-              price: resource.price || 0,
-              currency: resource.currency || 'USD',
-              rating: resource.rating || 0,
+            const props = { ...baseProps, type: 'blog' };
+            return <ItemCard {...props} />;
+          }
+
+          if (resource.type === 'product') {
+            const props = {
+              ...baseProps,
               affiliateLink: resource.affiliateLink || '',
-            };
-          }
-          else if (resource.type === 'app') {
-            specificProps = {
-              tags: resource.tags || [],
+              price: fmt(resource.price, resource.currency || 'USD'),
+              currency: resource.currency || 'USD',
+              rating: typeof resource.rating === 'number' ? resource.rating : undefined,
               categories: resource.categories || [],
+            };
+            return <ItemCard {...props} />;
+          }
+
+          if (resource.type === 'app') {
+            const props = {
+              ...baseProps,
               platform: resource.platform || [],
-              price: resource.price || 0,
-              currency: resource.currency || 'USD',
-              rating: resource.rating || 0,
-              developer: resource.developer || '',
-              version: resource.version || '',
-              isFreemium: resource.isFreemium || false,
-              hasSubscription: resource.hasSubscription || false,
               downloadLink: resource.downloadLink || '',
-            };
-          }
-          else if (resource.type === 'website') {
-            specificProps = {
-              tags: resource.tags || [],
-              categories: resource.categories || [],
-              url: resource.url || '',
-              technologies: resource.technologies || [],
-              services: resource.services || [],
-              hasFreeTier: resource.hasFreeTier || false,
-              hasPaidPlan: resource.hasPaidPlan || false,
-              monthlyPrice: resource.monthlyPrice || 0,
+              price: fmt(resource.price, resource.currency || 'USD'),
               currency: resource.currency || 'USD',
-              rating: resource.rating || 0,
+              rating: typeof resource.rating === 'number' ? resource.rating : undefined,
             };
+            return <ItemCard {...props} />;
           }
-          
-          // Merge the base props with specific props
-          const props = { ...baseProps, ...specificProps };
-          
-          return (
-            <ItemCard {...props} />
-          );
+
+          const props = {
+            ...baseProps,
+            url: resource.url || '',
+            monthlyPrice:
+              typeof resource.monthlyPrice === 'number'
+                ? fmt(resource.monthlyPrice, resource.currency || 'USD')
+                : undefined,
+            currency: resource.currency || 'USD',
+            rating: typeof resource.rating === 'number' ? resource.rating : undefined,
+          };
+          return <ItemCard {...props} />;
         })
       ) : (
         <div class="no-resources">
@@ -360,18 +340,17 @@ const totalResources = filteredResources.length;
         </div>
       )}
     </div>
-    
+
     <!-- Pagination -->
     <div id="pagination-container" class="pagination-container"></div>
-    
+
     {debug && (productCount === 0 || appCount === 0 || websiteCount === 0) && (
       <div class="debug-help">
         <h3>Troubleshooting: Missing Collections</h3>
-        <p>It looks like some of your collections might not have any items. Here's what to check:</p>
         <ul>
-          {productCount === 0 && <li>Make sure you have created product files in <code>src/content/products/</code> directory</li>}
-          {appCount === 0 && <li>Make sure you have created app files in <code>src/content/apps/</code> directory</li>}
-          {websiteCount === 0 && <li>Make sure you have created website files in <code>src/content/websites/</code> directory</li>}
+          {productCount === 0 && <li>Make sure you have created product files in <code>src/content/products/</code></li>}
+          {appCount === 0 && <li>Make sure you have created app files in <code>src/content/apps/</code></li>}
+          {websiteCount === 0 && <li>Make sure you have created website files in <code>src/content/websites/</code></li>}
           <li>Ensure your content schema in <code>src/content/config.ts</code> has all collections defined</li>
           <li>Check that your content files have the correct frontmatter structure</li>
         </ul>
@@ -381,460 +360,384 @@ const totalResources = filteredResources.length;
 </section>
 
 <style>
-  /* * {
-    border: 1px solid red;
-  } */
-  
-  .section-title {
-    margin-bottom: var(--spacing-lg);
-    text-align: center;
+  .section-title { margin-bottom: var(--spacing-lg); text-align: center; }
+  .section-description { text-align: center; margin: 0 auto var(--spacing-lg); max-width: 700px; }
+  .container { position: relative; padding-top: 3rem; }
+  .filter-container { margin-bottom: var(--spacing-lg); }
+
+  .search-box { position: relative; max-width: 300px; margin: 0 auto var(--spacing-md); }
+  .search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); }
+  .search-box input { padding: 8px 12px 8px 40px; border-radius: var(--radius-md); width: 100%; border: 1px solid var(--color-border); }
+
+  .content-type-tabs, .filter-tabs {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-xs); margin-bottom: var(--spacing-md);
   }
-  
-  .section-description {
-    text-align: center;
-    margin-bottom: var(--spacing-lg);
-    max-width: 700px;
-    margin: 0 auto var(--spacing-lg);
+  .content-type-tab, .filter-tab {
+    padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md); border: 1px solid var(--color-border);
+    font-family: 'Roboto Mono', monospace; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+    background-color: var(--color-background, #fff); color: var(--color-text-light, #666);
   }
-  .container {
-    position: relative;
-    padding-top: 3rem;
+  .content-type-tab.active, .filter-tab.active { 
+    background-color: var(--color-primary, #007acc); 
+    color: var(--color-white, #fff); 
+    font-weight: 600; 
+  }
+  .content-type-tab:hover:not(.active), .filter-tab:hover:not(.active) { 
+    background-color: var(--color-white, #fff); 
+    color: var(--color-primary, #007acc); 
   }
 
-  .filter-container {
-    margin-bottom: var(--spacing-lg);
-  }
-  
-  .search-box {
-    position: relative;
-    max-width: 300px;
-    margin: 0 auto var(--spacing-md);
-  }
-  
-  .search-box svg {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--color-text-light);
-  }
-  
-  .search-box input {
-    padding-left: 40px;
-    border-radius: var(--radius-md);
-    width: 100%;
-  }
-  
-  .content-type-tabs,
-  .filter-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
-    
-  }
-  
-  .content-type-tab,
-  .filter-tab {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    font-family: 'Roboto Mono', monospace;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    background-color: var(--color-background);
-    color: var(--color-text-light);
-  }
-  
-  .content-type-tab.active,
-  .filter-tab.active {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    font-weight: 600;
-  }
-  
-  .content-type-tab:hover:not(.active),
-  .filter-tab:hover:not(.active) {
-    background-color: var(--color-white);
-    color: var(--color-primary);
+  .tags-filter { margin-top: var(--spacing-md); }
+  .filter-title { text-align: center; font-size: 1.1rem; margin-bottom: var(--spacing-sm); color: var(--color-text-light, #666); }
+  .filter-tabs { 
+    display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-xs); 
+    margin-bottom: var(--spacing-md); max-width: 90%; margin-left: auto; margin-right: auto; 
   }
 
-  /* Tags Filter styles */
-  .tags-filter {
-    margin-top: var(--spacing-md);
-  }
-  
-  .filter-title {
-    text-align: center;
-    font-size: 1.1rem;
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-text-light);
-  }
-  
-  /* Make the tags filter horizontally scrollable on smaller screens */
-  .filter-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-md);
-    max-width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
   .resources-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-sm);
-    max-width: 100%;
-    margin: 0 auto;
-    width: 100%;
-    min-width: 200px;
-    
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm, 1rem);
+    max-width: 100%; margin: 0 auto; width: 100%; min-width: 200px;
   }
-  
-  .no-resources {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: var(--spacing-xl);
-    /* background-color: var(--color-white); */
-    border-radius: var(--radius-lg);
+  .no-resources { 
+    grid-column: 1 / -1; text-align: center; padding: var(--spacing-xl, 2rem); 
+    border-radius: var(--radius-lg, 8px); 
   }
-  
-  .debug-panel {
-    background-color: #f0f8ff;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    border: 1px solid #b0d8ff;
+
+  .debug-panel { 
+    background-color: #f0f8ff; border-radius: var(--radius-md, 6px); 
+    padding: var(--spacing-md, 1rem); margin-bottom: var(--spacing-lg, 1.5rem); 
+    border: 1px solid #b0d8ff; 
   }
-  
-  .debug-panel h3 {
-    margin-top: 0;
+  .debug-help { 
+    margin-top: var(--spacing-lg, 1.5rem); padding: var(--spacing-md, 1rem); 
+    background-color: #fff8f0; border-radius: var(--radius-md, 6px); 
+    border: 1px solid #ffe0b0; 
   }
-  
-  .debug-help {
-    margin-top: var(--spacing-lg);
-    padding: var(--spacing-md);
-    background-color: #fff8f0;
-    border-radius: var(--radius-md);
-    border: 1px solid #ffe0b0;
-  }
-  
-  .debug-help pre {
-    background-color: #f5f5f5;
-    padding: var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    overflow-x: auto;
-  }
-  
-  .filter-debug {
-    margin-top: var(--spacing-lg);
-    padding: var(--spacing-md);
-    background-color: #f5f5f5;
-    border-radius: var(--radius-md);
-    font-family: monospace;
-    display: none;
-  }
-  
-  @media (max-width: 992px) {
-    .resources-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
+
+  @media (max-width: 992px) { .resources-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 640px) {
-    .resources-grid {
-      grid-template-columns: 1fr;
+    .resources-grid { grid-template-columns: 1fr; }
+    .content-type-tabs, .filter-tabs { 
+      overflow-x: auto; padding-bottom: var(--spacing-sm, 0.5rem); 
+      margin-bottom: var(--spacing-md, 1rem); -webkit-overflow-scrolling: touch; 
+      scrollbar-width: none; 
     }
-    
-    .content-type-tabs,
-    .filter-tabs {
-      overflow-x: auto;
-      padding-bottom: var(--spacing-sm);
-      margin-bottom: var(--spacing-md);
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    
-    .content-type-tabs::-webkit-scrollbar,
-    .filter-tabs::-webkit-scrollbar {
-      display: none;
-    }
-    
-    .content-type-tab,
-    .filter-tab {
-      white-space: nowrap;
-    }
+    .content-type-tabs::-webkit-scrollbar, .filter-tabs::-webkit-scrollbar { display: none; }
+    .content-type-tab, .filter-tab { white-space: nowrap; }
   }
-  
-  /* Styles for the shuffle button and animations */
-  .shuffle-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--color-white);
-    color: var(--color-text);
-    border: 1px dashed var(--color-border);
+
+  .shuffle-button { 
+    display: flex; align-items: center; justify-content: center; 
+    background-color: var(--color-white, #fff); color: var(--color-text, #333); 
+    border: 1px dashed var(--color-border, #ddd); 
   }
-  
-  .shuffle-button:hover {
-    background-color: var(--color-background-light);
-    transform: rotate(5deg);
+  .shuffle-button:hover { 
+    background-color: var(--color-background-light, #f9f9f9); 
+    transform: rotate(5deg); 
   }
-  
-  .shuffle-button svg {
-    transition: transform 0.3s ease;
+  .shuffle-button svg { transition: transform 0.3s ease; }
+  .shuffle-button:hover svg { transform: rotate(180deg); }
+
+  .pagination-container { 
+    display: flex; justify-content: center; align-items: center; 
+    margin-top: var(--spacing-lg, 1.5rem); gap: var(--spacing-md, 1rem); 
   }
-  
-  .shuffle-button:hover svg {
-    transform: rotate(180deg);
+  .pagination-button { 
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem); 
+    border-radius: var(--radius-md, 6px); border: 1px solid var(--color-border, #ddd); 
+    background-color: var(--color-white, #fff); cursor: pointer; transition: all 0.2s; 
+    display: flex; align-items: center; gap: var(--spacing-xs, 0.25rem); 
   }
-  
-  /* Animation for card shuffling */
-  .card.shuffled {
-    transform: scale(0.95);
-    opacity: 0.7;
-    transition: all 0.2s ease-in-out;
+  .pagination-button:hover:not(:disabled) { 
+    background-color: var(--color-primary-light, #e6f3ff); 
+    color: var(--color-white, #fff); 
   }
-  
-  .card.shuffle-complete {
-    transform: scale(1);
-    opacity: 1;
-    transition: all 0.3s ease-in-out;
+  .pagination-button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .page-indicator { 
+    font-size: 0.9rem; color: var(--color-text-light, #666); 
+    padding: var(--spacing-sm, 0.5rem); 
   }
-  /* Add these styles to your existing <style> block */
-  .pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: var(--spacing-lg);
-    gap: var(--spacing-md);
-  }
-  
-  .pagination-button {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    background-color: var(--color-white);
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-  }
-  
-  .pagination-button:hover:not(:disabled) {
-    background-color: var(--color-primary-light);
-    color: var(--color-white);
-  }
-  
-  .pagination-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .page-indicator {
-    font-size: 0.9rem;
-    color: var(--color-text-light);
-    padding: var(--spacing-sm);
-  }
-  
-  @media (max-width: 640px) {
-    .pagination-container {
-      flex-direction: column;
-      gap: var(--spacing-sm);
-    }
+  @media (max-width: 640px) { 
+    .pagination-container { flex-direction: column; gap: var(--spacing-sm, 0.5rem); } 
   }
 </style>
 
-<script is:inline>
-  function initFilters() {
-    // All your setup code goes here
-    const contentTypeTabs = document.querySelectorAll('.content-type-tab');
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    const resourceCards = document.querySelectorAll('.card.resource-card');
-    const searchInput = document.getElementById('resource-search');
-    const shuffleButton = document.querySelector('.shuffle-button');
-    const resourcesContainer = document.getElementById('resources-container');
-    const paginationContainer = document.getElementById('pagination-container');
+<script>
+(function() {
+  'use strict';
+  
+  // Check if already initialized
+  if ((window as any).filtersInitialized) {
+    return;
+  }
+  (window as any).filtersInitialized = true;
 
-    const isDevelopmentMode =
-      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  function initFilters(): void {
+    const root = document.getElementById('browse-section');
+    if (!root) {
+      console.warn('Browse section not found');
+      return;
+    }
+
+    const contentTypeTabs = root.querySelectorAll('.content-type-tab:not(.shuffle-button)');
+    const filterTabs = root.querySelectorAll('.filter-tab');
+    const resourceCards = root.querySelectorAll('[data-content-type]');
+    const searchInput = root.querySelector('#resource-search') as HTMLInputElement | null;
+    const shuffleButton = root.querySelector('.shuffle-button');
+    const resourcesContainer = root.querySelector('#resources-container') as HTMLElement | null;
+    const paginationContainer = root.querySelector('#pagination-container') as HTMLElement | null;
 
     const postsPerPage = 6;
     let currentPage = 1;
-    let filteredCards = [];
-
+    let filteredCards: Element[] = [];
     let activeContentType = 'all';
     let activeTag = 'all';
 
-    function safeLog(...args) {
-      if (isDevelopmentMode) console.log(...args);
+    console.log('Filter initialization:', {
+      contentTypeTabs: contentTypeTabs.length,
+      filterTabs: filterTabs.length,
+      resourceCards: resourceCards.length,
+      searchInput: !!searchInput,
+      shuffleButton: !!shuffleButton
+    });
+
+    function sanitize(str: any): string {
+      if (typeof str !== 'string') return '';
+      return str.replace(/<[^>]*>/g, '').trim().toLowerCase();
     }
 
-    function sanitizeSearchInput(input) {
-      if (typeof input !== 'string') return '';
-      return input.replace(/<\/?[^>]+(>|$)/g, '').trim().substring(0, 100);
-    }
-
-    function isValidContentType(type) {
+    function isValidContentType(type: any): type is string {
       return ['all', 'blog', 'product', 'website', 'app'].includes(type);
     }
 
-    function filterResources() {
-      try {
-        const searchTerm = sanitizeSearchInput(searchInput?.value || '').toLowerCase();
-        filteredCards = [];
-
-        resourceCards.forEach((card) => {
-          const cardContentType = card.getAttribute('data-content-type');
-          const title = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
-          const description =
-            card.querySelector('.card-description')?.textContent?.toLowerCase() ||
-            card.querySelector('p')?.textContent?.toLowerCase() ||
-            '';
-
-          let cardTags = [];
-          const tagsStr = card.getAttribute('data-tags');
-          if (tagsStr) {
-            cardTags = tagsStr.toLowerCase().split(',').map((tag) => tag.trim());
-          }
-
-          const contentTypeMatch = activeContentType === 'all' || cardContentType === activeContentType;
-          const tagMatch = activeTag === 'all' || cardTags.includes(activeTag.toLowerCase());
-          const searchMatch =
-            searchTerm === '' ||
-            title.includes(searchTerm) ||
-            description.includes(searchTerm) ||
-            cardTags.some((tag) => tag.includes(searchTerm));
-
-          if (contentTypeMatch && tagMatch && searchMatch) {
-            filteredCards.push(card);
-          } else {
-            card.style.display = 'none';
-          }
-        });
-
-        updatePageDisplay();
-      } catch (error) {
-        safeLog('Error in filterResources:', error);
+    function showNoResults(show: boolean): void {
+      if (!resourcesContainer) return;
+      
+      let noResultsEl = document.getElementById('no-results-message');
+      if (!noResultsEl) {
+        noResultsEl = document.createElement('div');
+        noResultsEl.id = 'no-results-message';
+        noResultsEl.className = 'no-resources';
+        noResultsEl.innerHTML = '<p>No resources found matching the current filters.</p>';
+        const parent = resourcesContainer.parentNode;
+        if (parent) {
+          parent.insertBefore(noResultsEl, resourcesContainer.nextSibling);
+        }
+      }
+      
+      noResultsEl.style.display = show ? 'block' : 'none';
+      if (resourcesContainer) {
+        resourcesContainer.style.display = show ? 'none' : '';
       }
     }
 
-    function createPagination(totalItems) {
+    function filterResources(): void {
+      const searchTerm = sanitize(searchInput ? searchInput.value : '');
+      filteredCards = [];
+
+      console.log('Filtering with:', { activeContentType, activeTag, searchTerm });
+
+      Array.from(resourceCards).forEach((card, index) => {
+        const cardElement = card as HTMLElement;
+        const cardType = card.getAttribute('data-content-type');
+        const cardTags = card.getAttribute('data-tags') || '';
+        const cardTitle = sanitize(card.getAttribute('data-title') || '');
+        const cardDescription = sanitize(card.getAttribute('data-description') || '');
+
+        const tagsArray = cardTags.toLowerCase().split(',').map(t => t.trim()).filter(t => t);
+
+        const typeMatch = activeContentType === 'all' || cardType === activeContentType;
+        const tagMatch = activeTag === 'all' || tagsArray.includes(activeTag.toLowerCase());
+        const searchMatch = !searchTerm || 
+          cardTitle.includes(searchTerm) || 
+          cardDescription.includes(searchTerm) ||
+          tagsArray.some(tag => tag.includes(searchTerm));
+
+        if (typeMatch && tagMatch && searchMatch) {
+          filteredCards.push(card);
+          cardElement.style.display = '';
+        } else {
+          cardElement.style.display = 'none';
+        }
+
+        if (index < 3) {
+          console.log(`Card ${index}:`, {
+            type: cardType,
+            title: cardTitle.substring(0, 30),
+            tags: tagsArray,
+            matches: { typeMatch, tagMatch, searchMatch },
+            visible: typeMatch && tagMatch && searchMatch
+          });
+        }
+      });
+
+      console.log(`Filtered: ${filteredCards.length}/${resourceCards.length} cards`);
+      updatePageDisplay();
+    }
+
+    function createPagination(totalItems: number): void {
       if (!paginationContainer) return;
+      
       paginationContainer.innerHTML = '';
       const totalPages = Math.ceil(totalItems / postsPerPage);
+      
       if (totalPages <= 1) {
         paginationContainer.style.display = 'none';
         return;
       }
-
+      
       paginationContainer.style.display = 'flex';
 
       const prevButton = document.createElement('button');
-      prevButton.className = 'pagination-button prev-button';
-      prevButton.textContent = '← Prev';
+      prevButton.className = 'pagination-button';
+      prevButton.textContent = '← Previous';
       prevButton.disabled = currentPage === 1;
-      prevButton.onclick = () => {
+      prevButton.addEventListener('click', () => {
         if (currentPage > 1) {
           currentPage--;
           updatePageDisplay();
         }
-      };
+      });
 
       const nextButton = document.createElement('button');
-      nextButton.className = 'pagination-button next-button';
+      nextButton.className = 'pagination-button';
       nextButton.textContent = 'Next →';
       nextButton.disabled = currentPage >= totalPages;
-      nextButton.onclick = () => {
+      nextButton.addEventListener('click', () => {
         if (currentPage < totalPages) {
           currentPage++;
           updatePageDisplay();
         }
-      };
+      });
 
-      const pageIndicator = document.createElement('span');
-      pageIndicator.className = 'page-indicator';
-      pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+      const pageInfo = document.createElement('span');
+      pageInfo.className = 'page-indicator';
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
 
-      paginationContainer.append(prevButton, pageIndicator, nextButton);
+      paginationContainer.appendChild(prevButton);
+      paginationContainer.appendChild(pageInfo);
+      paginationContainer.appendChild(nextButton);
     }
 
-    function updatePageDisplay() {
-      filteredCards.forEach((card) => (card.style.display = 'none'));
+    function updatePageDisplay(): void {
+      filteredCards.forEach(card => {
+        const cardElement = card as HTMLElement;
+        cardElement.style.display = 'none';
+      });
+      
       const start = (currentPage - 1) * postsPerPage;
       const end = Math.min(start + postsPerPage, filteredCards.length);
+      
       for (let i = start; i < end; i++) {
         if (filteredCards[i]) {
-          filteredCards[i].style.display = '';
+          const cardElement = filteredCards[i] as HTMLElement;
+          cardElement.style.display = '';
         }
       }
+      
+      showNoResults(filteredCards.length === 0);
       createPagination(filteredCards.length);
+      
+      console.log(`Page ${currentPage}: showing ${end - start} of ${filteredCards.length} cards`);
     }
 
-    function shuffleVisibleCards() {
-      if (filteredCards.length <= 1) return;
-      const cardsToShuffle = [...filteredCards];
-      for (let i = cardsToShuffle.length - 1; i > 0; i--) {
+    function shuffleArray(array: Element[]): Element[] {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [cardsToShuffle[i], cardsToShuffle[j]] = [cardsToShuffle[j], cardsToShuffle[i]];
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
+      return shuffled;
+    }
 
-      filteredCards.forEach((card) => resourcesContainer.removeChild(card));
-      cardsToShuffle.forEach((card) => resourcesContainer.appendChild(card));
-      filteredCards = cardsToShuffle;
-
+    function shuffleCards(): void {
+      if (filteredCards.length <= 1 || !resourcesContainer) return;
+      
+      const shuffled = shuffleArray(filteredCards);
+      shuffled.forEach(card => resourcesContainer.appendChild(card));
+      filteredCards = shuffled;
       currentPage = 1;
       updatePageDisplay();
     }
 
-    contentTypeTabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        if (tab.getAttribute('data-action') === 'shuffle') return;
-        contentTypeTabs.forEach((t) => t.classList.remove('active'));
+    contentTypeTabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const newType = tab.getAttribute('data-type') || 'all';
+        
+        if (!isValidContentType(newType)) return;
+        
+        contentTypeTabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-pressed', 'false');
+        });
         tab.classList.add('active');
-        const type = tab.getAttribute('data-type');
-        activeContentType = isValidContentType(type) ? type : 'all';
+        tab.setAttribute('aria-pressed', 'true');
+        
+        activeContentType = newType;
         currentPage = 1;
+        
+        console.log('Content type changed to:', activeContentType);
         filterResources();
       });
     });
 
-    filterTabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        filterTabs.forEach((t) => t.classList.remove('active'));
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const newTag = tab.getAttribute('data-tag') || 'all';
+        
+        filterTabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-pressed', 'false');
+        });
         tab.classList.add('active');
-        activeTag = tab.getAttribute('data-tag')?.substring(0, 50) || 'all';
+        tab.setAttribute('aria-pressed', 'true');
+        
+        activeTag = newTag;
         currentPage = 1;
+        
+        console.log('Tag changed to:', activeTag);
         filterResources();
       });
     });
 
     if (searchInput) {
-      let searchTimeout;
-      searchInput.addEventListener('input', () => {
+      let searchTimeout: ReturnType<typeof setTimeout>;
+      const handleSearch = () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
           currentPage = 1;
           filterResources();
         }, 300);
-      });
+      };
+      
+      searchInput.addEventListener('input', handleSearch);
+      searchInput.addEventListener('keyup', handleSearch);
     }
 
     if (shuffleButton) {
-      shuffleButton.addEventListener('click', () => {
-        shuffleVisibleCards();
+      shuffleButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Shuffling cards');
+        shuffleCards();
       });
     }
 
+    console.log('Running initial filter...');
     filterResources();
   }
 
-  document.addEventListener('DOMContentLoaded', initFilters);
-  document.addEventListener('astro:after-swap', initFilters);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFilters);
+  } else {
+    initFilters();
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    (window as any).filtersInitialized = false;
+    initFilters();
+  });
+
+})();
 </script>

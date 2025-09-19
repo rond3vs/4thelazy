@@ -1,39 +1,55 @@
 ---
+/** ItemCard.astro */
+
 interface BaseProps {
   title: string;
   description?: string;
-  link: string;
+  link: string;                 // internal link fallback
   image?: string;
   contentType: 'blog' | 'product' | 'app' | 'website';
   isSponsored?: boolean;
-  pubDate?: string;
+  pubDate: string;              // passed as ISO string from ItemGrid
   updatedDate?: string;
   type?: string;
   draft?: boolean;
+  tags?: string[];
+  // Add these for filtering support
+  'data-content-type'?: string;
+  'data-tags'?: string;
+  'data-title'?: string;
+  'data-description'?: string;
 }
 
 interface BlogProps extends BaseProps {
   contentType: 'blog';
-  tags?: string[];
 }
 
 interface ProductProps extends BaseProps {
   contentType: 'product';
-  tags?: string[];
-  affiliateLink?: string;
+  price?: string;               // "$12.99"
+  currency?: string;            // "USD"
+  rating?: number;              // 0–5 (optional)
+  affiliateLink?: string;       // external URL
+  categories?: string[];        // optional
 }
 
 interface AppProps extends BaseProps {
   contentType: 'app';
   platform?: string[];
   downloadLink?: string;
-  tags?: string[];
+  // ✅ add these so spreading from ItemGrid is typed
+  price?: string;
+  currency?: string;
+  rating?: number;
 }
 
 interface WebsiteProps extends BaseProps {
   contentType: 'website';
   url?: string;
-  tags?: string[];
+  // ✅ add these so spreading from ItemGrid is typed
+  monthlyPrice?: string;
+  currency?: string;
+  rating?: number;
 }
 
 type Props = BlogProps | ProductProps | AppProps | WebsiteProps;
@@ -41,81 +57,81 @@ type Props = BlogProps | ProductProps | AppProps | WebsiteProps;
 const props = Astro.props as Props;
 
 const {
-  title,
-  description = "",
-  link,
-  image,
-  contentType,
-  isSponsored = false,
-  pubDate,
-  type,
-  draft = false,
+  title, description = "", link, image, contentType,
+  isSponsored = false, pubDate, updatedDate, type,
 } = props;
 
-if (!pubDate || draft) return;
+// Ensure tags is always an array
+const tags = props.tags || [];
+const tagsString = tags.join(',');
 
-// Tags/Categories fallback
-const tags = (Array.isArray(props.tags) ? props.tags
-           : Array.isArray((props as any).categories) ? (props as any).categories
-           : []) as string[];
+// Get data attributes from props (passed from ItemGrid) or fallback to computed values
+const dataContentType = props['data-content-type'] || contentType;
+const dataTags = props['data-tags'] || tagsString;
+const dataTitle = props['data-title'] || title;
+const dataDescription = props['data-description'] || description;
 
-// External URL logic
-const isExternal = (() => {
-  switch (contentType) {
-    case 'product': return !!(props as ProductProps).affiliateLink;
-    case 'app': return !!(props as AppProps).downloadLink;
-    case 'website': return !!(props as WebsiteProps).url;
-    default: return false;
-  }
-})();
+// external URL selection (kept simple)
+const href =
+  contentType === 'product' && (props as ProductProps).affiliateLink
+    ? (props as ProductProps).affiliateLink!
+    : contentType === 'app' && (props as AppProps).downloadLink
+    ? (props as AppProps).downloadLink!
+    : contentType === 'website' && (props as WebsiteProps).url
+    ? (props as WebsiteProps).url!
+    : link;
 
-const href = (() => {
-  if (contentType === 'product' && (props as ProductProps).affiliateLink) {
-    return (props as ProductProps).affiliateLink!;
-  }
-  if (contentType === 'app' && (props as AppProps).downloadLink) {
-    return (props as AppProps).downloadLink!;
-  }
-  if (contentType === 'website' && (props as WebsiteProps).url) {
-    return (props as WebsiteProps).url!;
-  }
-  return link;
-})();
+const isExternal =
+  (contentType === 'product' && !!(props as ProductProps).affiliateLink) ||
+  (contentType === 'app' && !!(props as AppProps).downloadLink) ||
+  (contentType === 'website' && !!(props as WebsiteProps).url);
 
-const contentEmojiLabel = {
-  blog: '📝 Blog',
-  product: '🛍️ Product',
-  app: '📱 App',
-  website: '🌐 Website',
-}[contentType];
+const price =
+  contentType === 'product'
+    ? (props as ProductProps).price
+    : contentType === 'app'
+    ? (props as AppProps).price
+    : undefined;
+
+const monthlyPrice = contentType === 'website' ? (props as WebsiteProps).monthlyPrice : undefined;
 ---
 
+<!-- render -->
 <div 
-  class="resource-card card"
-  data-content-type={contentType}
-  data-tags={tags.join(',')}
-  data-tags-lower={tags.map(t => t.toLowerCase()).join(',')}
+  class="resource-card card" 
+  data-content-type={dataContentType} 
+  data-tags={dataTags}
+  data-title={dataTitle}
+  data-description={dataDescription}
   data-pub-date={pubDate}
 >
-  <a href={href} class="card-link" target={isExternal ? "_blank" : "_self"} rel={isExternal ? "noopener noreferrer" : ""}>
+  <a href={href} class="card-link" target={isExternal ? "_blank" : "_self"} rel={isExternal ? "nofollow sponsored noopener" : ""}>
+    {image && (
+      <div class="card-media">
+        <img src={image} alt={title} loading="lazy" decoding="async" />
+      </div>
+    )}
     <div class="card-content">
       <div class="card-header">
-        {type && type.toLowerCase() !== contentType && (
-          <span class="badge custom-badge">{type}</span>
-        )}
-        <span class="badge content-badge">{contentEmojiLabel}</span>
+        {type && type.toLowerCase() !== contentType && <span class="badge custom-badge">{type}</span>}
+        <span class="badge content-badge">
+          {{ blog:'📝 Blog', product:'🛍️ Product', app:'📱 App', website:'🌐 Website' }[contentType]}
+        </span>
         {isSponsored && <span class="badge sponsored-badge">Sponsored</span>}
       </div>
-
+      
       <div class="card-body">
         <h3 class="card-title">{title}</h3>
+
+        {price && <div class="card-price">{price}</div>}
+        {monthlyPrice && <div class="card-price">{monthlyPrice}/month</div>}
+
         {description && <p class="card-description">{description}</p>}
 
-        {tags.length > 0 && (
+        {tags?.length > 0 && (
           <div class="card-tags">
-            {tags.slice(0, 4).map(tag => (
-              <span class="card-tag">{tag}</span>
-            ))}
+            {tags.slice(0,4).map((tag) => <span class="card-tag">{tag}</span>)}
+            {tags.length > 4 && <span class="card-tag-more">+{tags.length - 4} more</span>}
           </div>
         )}
       </div>
@@ -128,97 +144,121 @@ const contentEmojiLabel = {
     border: 1px solid #333;
     border-radius: 8px;
     padding: 0;
-    background: var(--color-white);
+    background: var(--color-white, #fff);
     transition: box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
     height: 100%;
     min-height: 200px;
+    overflow: hidden;
+  }
+  .resource-card.card:hover { 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
   }
 
-  .resource-card.card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  .card-link { 
+    text-decoration: none; 
+    color: inherit; 
+    display: flex; 
+    flex-direction: column; 
+    height: 100%; 
   }
 
-  .card-link {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  .card-media { 
+    background: #f9fafb; 
+  }
+  .card-media img { 
+    width: 100%; 
+    height: auto; 
+    display: block; 
   }
 
-  .card-content {
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    flex: 1;
+  .card-content { 
+    display: flex; 
+    flex-direction: column; 
+    padding: 16px; 
+    flex: 1; 
+  }
+  
+  .card-header { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 12px; 
+    flex-wrap: wrap; 
+  }
+  
+  .card-body { 
+    display: flex; 
+    flex-direction: column; 
+    flex: 1; 
   }
 
-  .card-header {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
+  .card-title { 
+    font-size: 1.2rem; 
+    margin: 0 0 8px; 
+    font-weight: 600; 
+  }
+  
+  .card-price { 
+    font-weight: 700; 
+    margin: 0 0 10px; 
+    color: var(--color-primary, #206A5D);
   }
 
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+  .card-description { 
+    font-size: 0.95rem; 
+    color: #555; 
+    margin: 0 0 12px; 
+    line-height: 1.4; 
   }
-
-  .card-title {
-    font-size: 1.2rem;
-    margin: 0 0 8px;
-    font-weight: 600;
+  
+  .card-tags { 
+    display: flex; 
+    gap: 8px; 
+    flex-wrap: wrap; 
+    margin-top: auto; 
   }
-
-  .card-description {
-    font-size: 0.95rem;
-    color: #555;
-    margin: 0 0 12px;
-    line-height: 1.4;
+  
+  .card-tag { 
+    background: #E8E6E3; 
+    border: 1px solid var(--color-border, #ddd); 
+    color: var(--color-primary, #206A5D); 
+    padding: 2px 6px; 
+    border-radius: 3px; 
+    font-size: 0.8rem; 
+    white-space: nowrap; 
   }
-
-  .card-tags {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: auto;
-  }
-
-  .card-tag {
-    background: #E8E6E3;
-    border: 1px solid var(--color-border);
-    color: var(--color-primary);
+  
+  .card-tag-more {
+    background: #f3f4f6;
+    color: #6b7280;
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.8rem;
-    white-space: nowrap;
+    font-style: italic;
   }
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    white-space: nowrap;
+  .badge { 
+    display: inline-flex; 
+    align-items: center; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 0.8rem; 
+    white-space: nowrap; 
   }
-
-  .custom-badge {
-    background: #0c5460;
-    color: #fff;
+  
+  .custom-badge { 
+    background: #0c5460; 
+    color: #fff; 
   }
-
-  .content-badge {
-    background: #206A5D;
-    color: #fff;
+  
+  .content-badge { 
+    background: #206A5D; 
+    color: #fff; 
   }
-
-  .sponsored-badge {
-    background: #b91c1c;
-    color: #fff;
+  
+  .sponsored-badge { 
+    background: #b91c1c; 
+    color: #fff; 
   }
 </style>
